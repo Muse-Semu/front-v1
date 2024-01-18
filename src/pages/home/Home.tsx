@@ -16,7 +16,8 @@ import "./home.scss";
 const Home = () => {
   return (
     <div className="gap-3 grid grid-cols-1 sm:mr-3  xl:grid-cols-3 lg:grid-cols-2 md:grid-cols-1 ">
-      <div className="p-5 rounded border 1 row-span-2">
+      
+      <div className="p-5 rounded border 1 row-span-2 ">
         <TopBox />
       </div>
       <div className="p-5 rounded border 2  ">

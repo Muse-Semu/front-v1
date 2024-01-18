@@ -2,7 +2,7 @@ import "./navbar.scss";
 
 const Navbar = () => {
   return (
-    <div className="navbar sticky top-0 bg-inherit z-20">
+    <div className="navbar sticky top-0 bg-inherit z-20 shadow-md mb-7">
       <div className="logo">
         <img src="logo.svg" alt="" />
         <span>Yegna</span>

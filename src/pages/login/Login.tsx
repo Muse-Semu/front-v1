@@ -7,7 +7,6 @@ const Login = () => {
         <div className="mb-5 shadow-md sticky top-0 bg-inherit p-4  border-inherit">
           <span
             className="close absolute top-4 right-2 cursor-pointer"
-           
           >
             <MdClose size={25} />
           </span>

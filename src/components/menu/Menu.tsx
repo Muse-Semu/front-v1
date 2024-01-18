@@ -4,7 +4,7 @@ import { menu } from "../../data.tsx";
 
 const Menu = () => {
   return (
-    <div className="menu grid fixed  overflow-y-auto lg:w-[200px] border-r border-gray-500  ">
+    <div className="menu grid fixed  overflow-y-auto xl:w-[190px]   ">
       <div className="h-[350px]  overflow-y-auto  ">
         {menu
           .filter(
@@ -14,12 +14,12 @@ const Menu = () => {
               menu.title === "analytics"
           )
           .map((item) => (
-            <div className="item  " key={item.id}>
+            <div className="item " key={item.id}>
               <span className="title">{item.title}</span>
               {item.listItems.map((listItem) => (
                 <Link
                   to={listItem.url}
-                  className=" listItem flex items-center gap-2 p-2 rounded-md font-bold "
+                  className=" listItem flex items-center gap-2 p-2  rounded-md  "
                   key={listItem.id}
                 >
                   <h1 className="text-xl">{listItem.icon}</h1>

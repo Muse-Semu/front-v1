@@ -9,17 +9,15 @@ import "./styles/global.scss";
 import User from "./pages/user/User";
 import Product from "./pages/product/Product";
 
-import './index.css'
-import {
-  QueryClient,
-  QueryClientProvider,
-} from "@tanstack/react-query";
+import "./index.css";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Subjects, { SingleSubject } from "./pages/subject/Subjects";
 import Category from "./pages/category/Category";
 import SingleExam from "./pages/exams/SingleExam";
 import Exams from "./pages/exams/Exams";
 import SingleCategory from "./pages/category/SingleCategory";
-
+import Dashboard from "./endUsercomponents/subjects/Subjects";
+import SubjectList from "./endUsercomponents/subjects/Subjects";
 const queryClient = new QueryClient();
 
 function App() {
@@ -27,11 +25,11 @@ function App() {
     return (
       <div className="main ">
         <Navbar />
-        <div className="grid grid-cols-5 gap-2">
-          <div className="ml-2 overflow-y-auto  top-5 h-screen  ">
+        <div className="grid grid-cols-6 gap-1  ">
+          <div className="ml-2 overflow-y-auto col-span-1 top-5 h-screen  mt-5  ">
             <Menu />
           </div>
-          <div className=" col-span-4 mr-4  ">
+          <div className=" col-span-5 mr-4  ">
             <QueryClientProvider client={queryClient}>
               <Outlet />
             </QueryClientProvider>
@@ -49,7 +47,7 @@ function App() {
       children: [
         {
           path: "/",
-          element: <Home />,
+          element: <SubjectList />,
         },
         {
           path: "/users",
@@ -87,7 +85,6 @@ function App() {
           path: "/examCategory/:id",
           element: <SingleCategory />,
         },
-        
       ],
     },
     {

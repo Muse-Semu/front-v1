@@ -15,7 +15,7 @@
 
 /* Thumb */
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(rgba(28,45,200),rgba(10,30,80));
+  background: linear-gradient(rgb(233, 227, 227),rgb(112, 111, 111));
   border-radius: 6px;
   height: 20px;
 }
@@ -57,4 +57,8 @@
 
 .home-box{
   @apply p-5 rounded-lg border-2
+}
+
+*{
+  @apply font-sans
 }
