@@ -76,6 +76,13 @@ const columns: GridColDef[] = [
   },
 ];
 
+const otherfields = [{
+  image:'image',
+  headerName:"Image",
+  placeholder:"upload image here",
+  type:"file",
+}]
+
 function Exams() {
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -133,6 +140,7 @@ function Exams() {
           subject={data.subject}
           examCategory={data.examCategory}
           columns={columns}
+          otherFields = {otherfields}
           setOpen={setOpen}
         />
       )}

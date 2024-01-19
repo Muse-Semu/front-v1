@@ -4,7 +4,7 @@ import { menu } from "../../data.tsx";
 
 const Menu = () => {
   return (
-    <div className="menu grid fixed  overflow-y-auto xl:w-[190px]   ">
+    <div className="  fixed  overflow-y-auto xl:w-[190px]   ">
       <div className="h-[350px]  overflow-y-auto  ">
         {menu
           .filter(
@@ -15,15 +15,17 @@ const Menu = () => {
           )
           .map((item) => (
             <div className="item " key={item.id}>
-              <span className="title">{item.title}</span>
+              <span className="title text-[12px] font-extralight uppercase hidden lg:block ">
+                {item.title}
+              </span>
               {item.listItems.map((listItem) => (
                 <Link
                   to={listItem.url}
-                  className=" listItem flex items-center gap-2 p-2  rounded-md  "
+                  className=" listItem flex items-center hover:bg-slate-700 gap-2 p-2 mx-2  rounded-md capitalize "
                   key={listItem.id}
                 >
                   <h1 className="text-xl">{listItem.icon}</h1>
-                  <span className="listItemTitle">{listItem.title}</span>
+                  <span className="listItemTitle hidden lg:block">{listItem.title}</span>
                 </Link>
               ))}
             </div>
@@ -42,8 +44,10 @@ const Menu = () => {
                   className="listItem flex items-center gap-2 p-2 rounded-md "
                   key={listItem.id}
                 >
-                   <h1>{listItem.icon}</h1>
-                  <span className="listItemTitle">{listItem.title}</span>
+                  <h1>{listItem.icon}</h1>
+                  <span className="listItemTitle hidden lg:block">
+                    {listItem.title}
+                  </span>
                 </Link>
               ))}
             </div>

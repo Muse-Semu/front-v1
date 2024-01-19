@@ -18,6 +18,7 @@ import Exams from "./pages/exams/Exams";
 import SingleCategory from "./pages/category/SingleCategory";
 import Dashboard from "./endUsercomponents/subjects/Subjects";
 import SubjectList from "./endUsercomponents/subjects/Subjects";
+import ImageUpload from "./components/add_image/UploadingImage";
 const queryClient = new QueryClient();
 
 function App() {
@@ -25,14 +26,13 @@ function App() {
     return (
       <div className="main ">
         <Navbar />
+       
         <div className="grid grid-cols-6 gap-1  ">
-          <div className="ml-2 overflow-y-auto col-span-1 top-5 h-screen  mt-5  ">
+          <div className="ml-2  col-span-1 top-5 mt-5 h-screen ">
             <Menu />
           </div>
           <div className=" col-span-5 mr-4  ">
-            <QueryClientProvider client={queryClient}>
-              <Outlet />
-            </QueryClientProvider>
+            <Outlet />
           </div>
         </div>
         <Footer />

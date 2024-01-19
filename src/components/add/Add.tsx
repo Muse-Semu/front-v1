@@ -5,11 +5,7 @@ import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { boxAction } from "../../redux/boxSlice";
 import MessageBox from "../messages/MessageBox";
-import {
-  addCategory,
-  addExam,
-  addSubject,
-} from "../../api/APIService";
+import { addCategory, addExam, addSubject } from "../../api/APIService";
 
 type Props = {
   slug: string;
@@ -28,7 +24,20 @@ const Add = (props: Props) => {
     type: "",
     msg: "",
   });
+  const [image, setImage] = useState(null);
 
+  const handleUploadChange = (e) => {
+    const imageFile = e.target.files[0];
+    const reader = new FileReader();
+    console.log(imageFile);
+    
+    reader.onload = () => {
+      setImage(reader.result);
+    };
+    if (imageFile) {
+      reader.readAsDataURL(imageFile);
+    }
+  };
   const handleClear = () => {
     console.log("Data cleared!");
   };
@@ -43,7 +52,9 @@ const Add = (props: Props) => {
       console.log(slug);
 
       try {
-        const response = await apiFunction(slug ==="exam"?JSON.stringify(additionalData):formData);
+        const response = await apiFunction(
+          slug === "exam" ? JSON.stringify(additionalData) : formData
+        );
         props.setOpen(false);
         setMessage({ type: "success", msg: `${slug} Added successfully` });
       } catch (error: any) {
@@ -54,7 +65,7 @@ const Add = (props: Props) => {
         dispatch(boxAction.showBox(box));
       }
     };
-    
+
     switch (props.slug.toLowerCase()) {
       case "subject":
         handleApiCall(addSubject, "subject", {});
@@ -109,7 +120,6 @@ const Add = (props: Props) => {
             .filter(
               (item) =>
                 item.field !== "id" &&
-                item.field !== "img" &&
                 item.field !== "examCategory" &&
                 item.field !== "subject" &&
                 item.field !== "createdAt" &&
@@ -181,13 +191,40 @@ const Add = (props: Props) => {
                     ))}
                 </select>
               </div>
-              {/* <label htmlFor="kd">
-               Add Image <MdImage/>
-                    
-                      <input type="file" name="kd" id="" className="hidden"/>
-                    
-          
-              </label> */}
+              <div className=" grid gap-2 ">
+                <p className="form-label">Image</p>
+                <div className="form-input">
+                {image ? (
+                  <div className="grid  p-2 gap-2 ">
+                    <img src={image} alt="" className=" max-h-[400px] w-full rounded-md object-cover" />
+                    <div>
+                      <button
+                        onClick={() => setImage(null)}
+                        className="rounded-md p-2 text-center cursor-pointer bg-red-500 w-full"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    {" "}
+                    <label className=" p-3 cursor-pointer  flex items-center justify-center">
+                      <div className="rounded-md flex flex-col gap-1 p-2 w-full items-center justify-center border-dashed border ">
+                        <h1>upload image</h1> <MdImage size={50} />
+                      </div>
+                      <input
+                        type="file"
+                        id=""
+                        className="hidden"
+                        accept="image/*"
+                        onChange={handleUploadChange}
+                      />
+                    </label>
+                  </>
+                )}
+                </div>
+              </div>
             </>
           )}
 
