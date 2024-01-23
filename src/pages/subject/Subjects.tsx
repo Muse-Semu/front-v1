@@ -1,53 +1,22 @@
-import { useEffect, useState } from "react";
+import { Reducer, useEffect, useState } from "react";
 import DataTable from "../../components/dataTable/DataTable";
-import Add from "../../components/add/Add";
+import Add from "../../components/crud/Add";
 import { GridColDef } from "@mui/x-data-grid";
 import { getSubject, getSubjectById } from "../../api/APIService";
 import { useDispatch, useSelector } from "react-redux";
 import Loading from "../../components/loading/Loading";
 import { useParams } from "react-router-dom";
+import { slugs } from "../../constant";
+import { columns } from "./columns";
 
-const columns: GridColDef[] = [
-  { field: "id", headerName: "ID", width: 10 },
-  // {
-  //   field: "img",
-  //   headerName: "Image",
-  //   width: 100,
-  //   renderCell: (params) => {
-  //     return <img src={params.row.img || "/noavatar.png"} alt="" />;
-  //   },
-  // },
-  {
-    field: "title",
-    type: "string",
-    headerName: "Title",
-    width: 250,
-  },
 
-  {
-    field: "description",
-    headerName: "Desciption",
-    width: 200,
-    type: "string",
-  },
-];
 
 function Subjects() {
   const dispatch = useDispatch()
   const [open, setOpen] = useState(false);
-  const [subject, setSubject] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const subject  = useSelector((state)=>state.exam.subject);
+  const [loading, setLoading] = useState(false);
 
-  // const sub = useSelector((state)=>state.exam.subject)
-
-  useEffect(() => {
-    // dispatch(examAction.fetchSubject(sub));
-    getSubject().then((res) => {
-      setSubject(res);
-      setLoading(false);
-    });
-    setTimeout(()=>{setLoading(false)},5000)
-  }, []);
 
   const box = useSelector((state) => state.box.isOpen);
   // console.log(box,sub);
@@ -69,13 +38,13 @@ function Subjects() {
       {loading ? (
         <Loading />
       ) : ( subject.length != 0 ?
-        <DataTable slug="subject" columns={columns} rows={subject} />:(
+        <DataTable slug={slugs.SUBJECT} columns={columns} rows={subject} />:(
           <>Error</>
         )
       )}
 
       {open && (
-        <Add slug="subject"  columns={columns} setOpen={setOpen} />
+        <Add slug={slugs.SUBJECT} columns={columns} setOpen={setOpen} />
       )}
     </div>
   );

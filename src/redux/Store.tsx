@@ -6,7 +6,6 @@ const store =configureStore({
    reducer:{
     exam:examSlice.reducer,
     box:boxSlice.reducer
-
    }
 })
 

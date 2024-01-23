@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import "./menu.scss";
-import { menu } from "../../data.tsx";
+import { menu } from "./menuConstanst";
 
 const Menu = () => {
   return (
@@ -24,7 +24,7 @@ const Menu = () => {
                   className=" listItem flex items-center hover:bg-slate-700 gap-2 p-2 mx-2  rounded-md capitalize "
                   key={listItem.id}
                 >
-                  <h1 className="text-xl">{listItem.icon}</h1>
+                  <h1 className="text-xl" title={listItem.title}>{listItem.icon} </h1>
                   <span className="listItemTitle hidden lg:block">{listItem.title}</span>
                 </Link>
               ))}

@@ -1,4 +1,3 @@
-import Home from "./pages/home/Home";
 import { createBrowserRouter, RouterProvider, Outlet } from "react-router-dom";
 import Users from "./pages/users/Users";
 import Navbar from "./components/navbar/Navbar";
@@ -6,22 +5,22 @@ import Footer from "./components/footer/Footer";
 import Menu from "./components/menu/Menu";
 import Login from "./pages/login/Login";
 import "./styles/global.scss";
-import User from "./pages/user/User";
 import Product from "./pages/product/Product";
 
 import "./index.css";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClient } from "@tanstack/react-query";
 import Subjects, { SingleSubject } from "./pages/subject/Subjects";
-import Category from "./pages/category/Category";
 import SingleExam from "./pages/exams/SingleExam";
 import Exams from "./pages/exams/Exams";
-import SingleCategory from "./pages/category/SingleCategory";
-import Dashboard from "./endUsercomponents/subjects/Subjects";
 import SubjectList from "./endUsercomponents/subjects/Subjects";
-import ImageUpload from "./components/add_image/UploadingImage";
-const queryClient = new QueryClient();
+import SingleUser from "./pages/users/SingleUser";
+import { slugs } from "./constant";
+import ExamCategory from "./pages/category/ExamCategory";
+import SingleExamCategory from "./pages/category/SingleExamCategory";
+import { useSelector } from "react-redux";
 
 function App() {
+  const box = useSelector((state)=>state.box.isOpen)
   const Layout = () => {
     return (
       <div className="main ">
@@ -31,7 +30,7 @@ function App() {
           <div className="ml-2  col-span-1 top-5 mt-5 h-screen ">
             <Menu />
           </div>
-          <div className=" col-span-5 mr-4  ">
+          <div className=" col-span-5 mr-4 mt-3  ">
             <Outlet />
           </div>
         </div>
@@ -54,36 +53,36 @@ function App() {
           element: <Users />,
         },
         {
-          path: "/exams",
+          path: `${slugs.EXAM}/`,
           element: <Exams />,
         },
         {
-          path: "/exams/:id",
+          path: `/${slugs.EXAM}/:id`,
           element: <SingleExam />,
         },
         {
-          path: "/users/:id",
-          element: <User />,
+          path: `/${slugs.USER}/:id`,
+          element: <SingleUser />,
         },
         {
           path: "/products/:id",
           element: <Product />,
         },
         {
-          path: "/subjects",
+          path: `/${slugs.SUBJECT}`,
           element: <Subjects />,
         },
         {
-          path: "subject/:id",
+          path: `/${slugs.SUBJECT}/:id`,
           element: <SingleSubject />,
         },
         {
-          path: "/category",
-          element: <Category />,
+          path: `/${slugs.EXAM_CATEGORY}`,
+          element: <ExamCategory />,
         },
         {
-          path: "/examCategory/:id",
-          element: <SingleCategory />,
+          path: `/${slugs.EXAM_CATEGORY}/:id`,
+          element: <SingleExamCategory />,
         },
       ],
     },

@@ -1,23 +1,24 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { getExams, getSubject } from "../api/APIService";
+import { getExamCategory, getExams, getSubject } from "../api/APIService";
 
-
-interface StateType {
+export interface StateType {
   isOpened: boolean;
   subject: any[];
-  exams:any[];
+  exams: any[];
   exam_category: any[];
+  isLoading: boolean;
 }
+
 
 const initialState: StateType = {
   isOpened: false,
-  subject: [],
-  exams: [],
-  exam_category: [],
+  subject: await getSubject(),
+  exams:await getExams(),
+  exam_category: await getExamCategory(),
+  isLoading: false,
 };
-
 const examSlice = createSlice({
-  name: "exams",
+  name: "exam",
   initialState,
   reducers: {
     handleOpen: (state) => {
@@ -26,13 +27,10 @@ const examSlice = createSlice({
     handleAdd: (state, action) => {
       // Handle adding an exam here, using appropriate types
     },
-    fetchSubject: (state) => {
-      state.subject = getSubject()
+    handleLoading(state) {
+      state.isLoading = false;
     },
-    fetchExams:  (state) => {
-     state.exams = getExams();
     
-    },
   },
 });
 

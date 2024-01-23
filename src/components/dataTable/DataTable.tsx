@@ -4,10 +4,11 @@ import {
   GridToolbar,
 } from "@mui/x-data-grid";
 import "./dataTable.scss";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import ConfirmBox from "../messages/ConfirmBox";
 import { boxAction } from "../../redux/boxSlice";
+import { Cell } from "recharts";
 // import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 type Props = {
@@ -20,6 +21,7 @@ const DataTable = (props: Props) => {
     const navigate = useNavigate()
     const dispatch = useDispatch()
     const confirmBox = useSelector(state=>state.box.isConfirmBox)
+    
   // TEST THE API
 
   // const queryClient = useQueryClient();
@@ -48,7 +50,7 @@ const DataTable = (props: Props) => {
     width: 100,
     renderCell: (params) => {
       return (
-        <div className="action">
+        <div className="action" >
           <button onClick={()=>navigate(`/${props.slug}/${params.row.id}`)} >
             <img src="/view.svg" alt="" />
           </button>
@@ -86,8 +88,14 @@ const DataTable = (props: Props) => {
         disableColumnFilter
         disableDensitySelector
         disableColumnSelector
+        onCellClick={(params)=>{navigate(`/${props.slug}/${params.row.id}`)
+         console.log(props.slug);
+        }}
+        
       />
-      { confirmBox && (<ConfirmBox message={{type:"error",msg:"Are you sure to "}}/>)}
+      {confirmBox && (
+        <ConfirmBox message={{ type: "error", msg: "Are you sure to " }} />
+      )}
     </div>
   );
 };
