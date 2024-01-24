@@ -18,6 +18,7 @@ import { slugs } from "./constant";
 import ExamCategory from "./pages/category/ExamCategory";
 import SingleExamCategory from "./pages/category/SingleExamCategory";
 import { useSelector } from "react-redux";
+import Questions from "./pages/questions/Questions";
 
 function App() {
   const box = useSelector((state)=>state.box.isOpen)
@@ -83,6 +84,10 @@ function App() {
         {
           path: `/${slugs.EXAM_CATEGORY}/:id`,
           element: <SingleExamCategory />,
+        },
+        {
+          path: `/${slugs.EXAM}/:id/${slugs.QUESTION}`,
+          element: <Questions />,
         },
       ],
     },

@@ -1,21 +1,30 @@
-import { createSlice } from "@reduxjs/toolkit";
-import { getExamCategory, getExams, getSubject } from "../api/APIService";
+import {
+  createAsyncThunk,
+  createSlice,
+} from "@reduxjs/toolkit";
+import { getExams } from "../api/APIService";
 
 export interface StateType {
   isOpened: boolean;
-  subject: any[];
   exams: any[];
-  exam_category: any[];
   isLoading: boolean;
+  error: String;
 }
 
+export const fetchExams = createAsyncThunk("fetch/exam", async () => {
+  try {
+    const response = await getExams().then((res) => res);
+    return response
+  } catch (error: any) {
+    return [{"error":"Connection refuced"}];
+  }
+});
 
 const initialState: StateType = {
   isOpened: false,
-  subject: await getSubject(),
-  exams:await getExams(),
-  exam_category: await getExamCategory(),
+  exams: [],
   isLoading: false,
+  error: "",
 };
 const examSlice = createSlice({
   name: "exam",
@@ -24,13 +33,24 @@ const examSlice = createSlice({
     handleOpen: (state) => {
       state.isOpened = !state.isOpened;
     },
-    handleAdd: (state, action) => {
-      // Handle adding an exam here, using appropriate types
-    },
-    handleLoading(state) {
-      state.isLoading = false;
-    },
-    
+   
+  },
+
+  extraReducers(builder) {
+    builder
+      .addCase(fetchExams.pending, (state, action) => {
+        state.isLoading = true;
+      })
+
+      .addCase(fetchExams.fulfilled, (state, action) => {
+        state.exams = action.payload;
+        state.isLoading = false
+      })
+      .addCase(fetchExams.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = "Error";
+        state.exams =[]
+      });
   },
 });
 

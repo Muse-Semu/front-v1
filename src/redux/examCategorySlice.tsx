@@ -1,16 +1,16 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { getSubject } from "../api/APIService";
+import { getExamCategory } from "../api/APIService";
 
 export interface StateType {
   isOpened: boolean;
-  subjects: any[];
+  examCategorys: any[];
   isLoading: boolean;
   error: String;
 }
 
-export const fetchSubjects = createAsyncThunk("fetch/subject", async () => {
+export const fetchExamCategory = createAsyncThunk("fetch/examCategorys", async () => {
   try {
-    const response = await getSubject().then((res) => res);
+    const response = await getExamCategory().then((res) => res);
     return [...response];
   } catch (error: any) {
     return [{ error: "Connection refuced" }];
@@ -19,12 +19,12 @@ export const fetchSubjects = createAsyncThunk("fetch/subject", async () => {
 
 const initialState: StateType = {
   isOpened: false,
-  subjects: [],
+  examCategorys: [],
   isLoading: false,
   error: "",
 };
-const subjectSlice = createSlice({
-  name: "subject",
+const examCategorySlice = createSlice({
+  name: "examCategory",
   initialState,
   reducers: {
     handleOpen: (state) => {
@@ -34,22 +34,22 @@ const subjectSlice = createSlice({
 
   extraReducers(builder) {
     builder
-      .addCase(fetchSubjects.pending, (state, action) => {
+      .addCase(fetchExamCategory.pending, (state, action) => {
         state.isLoading = true;
       })
 
-      .addCase(fetchSubjects.fulfilled, (state, action) => {
-        state.subjects = action.payload;
+      .addCase(fetchExamCategory.fulfilled, (state, action) => {
+        state.examCategorys = action.payload;
         state.isLoading = false;
       })
-      .addCase(fetchSubjects.rejected, (state, action) => {
+      .addCase(fetchExamCategory.rejected, (state, action) => {
         state.isLoading = false;
         state.error = "Error";
-        state.subjects = [];
+        state.examCategorys = [];
       });
   },
 });
 
-export const subjectAction = subjectSlice.actions;
+export const examCategoryAction = examCategorySlice.actions;
 
-export default subjectSlice;
+export default examCategorySlice;

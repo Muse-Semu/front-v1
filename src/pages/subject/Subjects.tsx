@@ -8,15 +8,17 @@ import Loading from "../../components/loading/Loading";
 import { useParams } from "react-router-dom";
 import { slugs } from "../../constant";
 import { columns } from "./columns";
-
-
+import { fetchSubjects } from "../../redux/subjectSlice";
 
 function Subjects() {
   const dispatch = useDispatch()
   const [open, setOpen] = useState(false);
-  const subject  = useSelector((state)=>state.exam.subject);
+  const subject  = useSelector((state)=>state.subject.subjects);
   const [loading, setLoading] = useState(false);
 
+  useEffect(()=>{
+    dispatch(fetchSubjects())
+  })
 
   const box = useSelector((state) => state.box.isOpen);
   // console.log(box,sub);
