@@ -6,18 +6,24 @@ import Loading from "../../components/loading/Loading";
 import { slugs } from "../../constant";
 import { columns } from "./columns";
 import store from "../../redux/Store";
-import { fetchExamCategory } from "../../redux/examCategorySlice";
+import {
+  fetchExamCategory,
+  getExamCategorySatus,
+  selectAllExamCategorys,
+} from "../../redux/examCategorySlice";
 
 function ExamCategory() {
   const [open, setOpen] = useState(false);
-  const examCategory = store.getState().examCategory.examCategorys;
-  const isLoading = store.getState().examCategory.isLoading;
-  const diapatch = useDispatch();
+  const examCategory = useSelector(selectAllExamCategorys);
+  const examCategoryStatus = useSelector(getExamCategorySatus);
+  const dispatch = useDispatch();
   const box = store.getState().box.isOpen;
 
   useEffect(() => {
-    diapatch(fetchExamCategory());
-  }, []);
+    if (examCategoryStatus === "idle") {
+      dispatch(fetchExamCategory());
+    }
+  }, [examCategoryStatus, dispatch]);
 
   return (
     <div className="products ">
@@ -31,7 +37,7 @@ function ExamCategory() {
         </button>
       </div>
 
-      {isLoading ? (
+      {examCategoryStatus === "pending" ? (
         <Loading />
       ) : examCategory.length != 0 ? (
         <DataTable

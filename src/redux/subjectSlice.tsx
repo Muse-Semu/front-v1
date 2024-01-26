@@ -2,53 +2,57 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { getSubject } from "../api/APIService";
 
 export interface StateType {
-  isOpened: boolean;
   subjects: any[];
-  isLoading: boolean;
-  error: String;
+  status:string,
+  error:any
 }
 
-export const fetchSubjects = createAsyncThunk("fetch/subject", async () => {
+
+
+const initialState: StateType = {
+  subjects: [],
+  status:'idle',
+  error:null
+
+};
+
+export const fetchSubjects = createAsyncThunk<any, void>("fetch/data", async () => {
   try {
     const response = await getSubject().then((res) => res);
     return [...response];
   } catch (error: any) {
-    return [{ error: "Connection refuced" }];
+    return error;
   }
 });
 
-const initialState: StateType = {
-  isOpened: false,
-  subjects: [],
-  isLoading: false,
-  error: "",
-};
 const subjectSlice = createSlice({
   name: "subject",
   initialState,
   reducers: {
-    handleOpen: (state) => {
-      state.isOpened = !state.isOpened;
-    },
+    
   },
 
   extraReducers(builder) {
     builder
       .addCase(fetchSubjects.pending, (state, action) => {
-        state.isLoading = true;
+        state.status = 'pending';
       })
 
       .addCase(fetchSubjects.fulfilled, (state, action) => {
         state.subjects = action.payload;
-        state.isLoading = false;
+        state.status = 'succeeded';
       })
       .addCase(fetchSubjects.rejected, (state, action) => {
-        state.isLoading = false;
-        state.error = "Error";
-        state.subjects = [];
+        state.status = 'failed';
+        state.error = action.error.message;
+       
       });
   },
 });
+
+export const selectAllSubjects = (state: any) => state.subject.subjects;
+export const getSubjectSatus = (state: any) => state.subject.status;
+export const getSubjectError = (state: any) => state.subject.error;
 
 export const subjectAction = subjectSlice.actions;
 

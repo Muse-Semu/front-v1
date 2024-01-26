@@ -2,26 +2,33 @@ import { Reducer, useEffect, useState } from "react";
 import DataTable from "../../components/dataTable/DataTable";
 import Add from "../../components/crud/Add";
 import { GridColDef } from "@mui/x-data-grid";
-import { getSubject, getSubjectById } from "../../api/APIService";
+import { getSubjectById } from "../../api/APIService";
 import { useDispatch, useSelector } from "react-redux";
 import Loading from "../../components/loading/Loading";
 import { useParams } from "react-router-dom";
 import { slugs } from "../../constant";
 import { columns } from "./columns";
-import { fetchSubjects } from "../../redux/subjectSlice";
+import {
+  fetchSubjects,
+  getSubjectSatus,
+  selectAllSubjects,
+} from "../../redux/subjectSlice";
+import store from "../../redux/Store";
 
 function Subjects() {
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
   const [open, setOpen] = useState(false);
-  const subject  = useSelector((state)=>state.subject.subjects);
-  const [loading, setLoading] = useState(false);
+  const subject = useSelector(selectAllSubjects);
+  const subjectStatus = useSelector(getSubjectSatus);
 
-  useEffect(()=>{
-    dispatch(fetchSubjects())
-  })
+  useEffect(() => {
+    if (subjectStatus === "idle") {
+      dispatch(fetchSubjects());
+    }
+  }, [subjectStatus, dispatch]);
 
   const box = useSelector((state) => state.box.isOpen);
-  // console.log(box,sub);
+
   return (
     <div className="products ">
       <div className="header">
@@ -34,38 +41,33 @@ function Subjects() {
         </button>
       </div>
 
-      {/* <DataTable slug="products" columns={columns} rows={subject} /> */}
-      {/* TEST THE API */}
-
-      {loading ? (
+      {subjectStatus === "pending" ? (
         <Loading />
-      ) : ( subject.length != 0 ?
-        <DataTable slug={slugs.SUBJECT} columns={columns} rows={subject} />:(
-          <>Error</>
-        )
+      ) : subject.length != 0 ? (
+        <DataTable slug={slugs.SUBJECT} columns={columns} rows={subject} />
+      ) : (
+        <>Error</>
       )}
 
-      {open && (
-        <Add slug={slugs.SUBJECT} columns={columns} setOpen={setOpen} />
-      )}
+      {open && <Add slug={slugs.SUBJECT} columns={columns} setOpen={setOpen} />}
     </div>
   );
 }
 
-export const SingleSubject = ()=>{
-  const {id} = useParams()
- 
-  const [singleSubject,setSingleSubject] = useState()
-  useEffect(()=>{
-    getSubjectById(id).then((res)=>{
-      setSingleSubject(res)
-    })
-  })
-  return <div>
+export const SingleSubject = () => {
+  const { id } = useParams();
+
+  const [singleSubject, setSingleSubject] = useState();
+  useEffect(() => {
+    getSubjectById(id).then((res) => {
+      setSingleSubject(res);
+    });
+  },[]);
+  return (
     <div>
-     { singleSubject}
+      <div></div>
     </div>
-  </div>
-}
+  );
+};
 
 export default Subjects;

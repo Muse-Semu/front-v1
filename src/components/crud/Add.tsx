@@ -51,13 +51,13 @@ const Add = (props: Props) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     console.log(Object.fromEntries(formData));
-    
+
     if (imageUploading) {
-      formData.append("file",imageUploading)
+      formData.append("file", imageUploading);
       await axios
-        .post("http://localhost:8082/api/uploads",formData)
+        .post("http://localhost:8082/api/uploads", formData)
         .then((res) => {
-          setImageUrl(res.data.url)
+          setImageUrl(res.data.url);
         })
         .catch((e) => console.log(e.message));
     }
@@ -67,7 +67,6 @@ const Add = (props: Props) => {
       slug: string,
       additionalData: {}
     ) => {
-
       try {
         const response = await apiFunction(
           slug === slugs.EXAM ? JSON.stringify(additionalData) : formData
@@ -91,13 +90,13 @@ const Add = (props: Props) => {
         handleApiCall(addExamCategory, "exam_category", {});
         break;
       case slugs.EXAM:
-        console.log("This is image "+imageUrl);
-        
+        console.log("This is image " + imageUrl);
+
         const readyToUpload = {
           ...Object.fromEntries(formData),
           subject: { id: subject },
           examCategory: { id: selected },
-          image_url : imageUrl
+          image_url: imageUrl,
         };
         handleApiCall(addExam, "exam", readyToUpload);
         break;
@@ -132,10 +131,7 @@ const Add = (props: Props) => {
           </h1>
         </div>
 
-        <form
-          className=" grid lg:grid-cols-2 gap-4 p-4"
-          onSubmit={handleSubmit}
-        >
+        <form className=" form-container " onSubmit={handleSubmit}>
           {props.columns
             .filter(
               (item) =>
@@ -146,10 +142,7 @@ const Add = (props: Props) => {
                 item.field !== "active"
             )
             .map((column) => (
-              <div
-                key={column.field}
-                className="w-full flex flex-col gap-2 mb-5 "
-              >
+              <div key={column.field} className=" label-with-input ">
                 <label className="form-label">{column.headerName}</label>
                 <input
                   className="form-input"
@@ -252,12 +245,12 @@ const Add = (props: Props) => {
             </>
           )}
 
-          <div className="w-full grid grid-cols-2 gap-2 lg:col-span-2 my-5 font-extrabold">
+          <div className="from-btn-div">
             <button className="submit-btn" type="submit">
               Add
             </button>
             <span
-              className="rounded-md p-2 text-center cursor-pointer bg-red-500 "
+              className="remove-btn "
               onClick={handleClear}
             >
               Clear

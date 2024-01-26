@@ -3,56 +3,63 @@ import {
   createSlice,
 } from "@reduxjs/toolkit";
 import { getExams } from "../api/APIService";
+import { baseUrl } from "../api/http-common";
 
 export interface StateType {
-  isOpened: boolean;
   exams: any[];
-  isLoading: boolean;
-  error: String;
+  status:string
+  error: any;
 }
 
-export const fetchExams = createAsyncThunk("fetch/exam", async () => {
-  try {
-    const response = await getExams().then((res) => res);
-    return response
-  } catch (error: any) {
-    return [{"error":"Connection refuced"}];
-  }
-});
+
 
 const initialState: StateType = {
-  isOpened: false,
   exams: [],
-  isLoading: false,
-  error: "",
+  status:'idle',
+  error:null
+ 
 };
+
+export const fetchExams = createAsyncThunk<any[], void>(
+  "fetch/exam",
+  async () => {
+    try {
+      const response = await baseUrl.get("/exam");
+      return response ? [...response.data] : [];
+    } catch (error: any) {
+      return [];
+    }
+  }
+);
 const examSlice = createSlice({
   name: "exam",
   initialState,
   reducers: {
-    handleOpen: (state) => {
-      state.isOpened = !state.isOpened;
-    },
+  
    
   },
 
   extraReducers(builder) {
     builder
       .addCase(fetchExams.pending, (state, action) => {
-        state.isLoading = true;
+        state.status = 'pending';
       })
 
       .addCase(fetchExams.fulfilled, (state, action) => {
         state.exams = action.payload;
-        state.isLoading = false
+        state.status = "succeeded";
       })
       .addCase(fetchExams.rejected, (state, action) => {
-        state.isLoading = false;
+        state.status = 'failed'
         state.error = "Error";
-        state.exams =[]
+        
       });
   },
 });
+
+export const selectAllExams = (state:any)=>state.exam.exams
+export const getExamSatus = (state:any) => state.exam.status;
+export const getExamError = (state:any)=>state.exam.error
 
 export const examAction = examSlice.actions;
 
