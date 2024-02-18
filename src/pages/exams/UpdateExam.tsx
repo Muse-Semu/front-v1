@@ -1,14 +1,21 @@
 import { GridColDef } from "@mui/x-data-grid";
 import { MdClose } from "react-icons/md";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { updateExam } from "../../api/APIService";
 import MessageBox from "../../components/messages/MessageBox";
 import store from "../../redux/Store";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { boxAction } from "../../redux/boxSlice";
+import {
+  fetchExamCategory,
+  getExamCategorySatus,
+} from "../../redux/examCategorySlice";
+import { fetchSubjects, getSubjectSatus } from "../../redux/subjectSlice";
+import { toast } from "react-toastify";
+import { fetchExams } from "../../redux/examSlice";
 
 type Props = {
-  id: number;
+  id: any;
   title: string;
   slug: string;
   columns: GridColDef[];
@@ -27,8 +34,12 @@ const UpdateExam = (props: Props) => {
     type: "",
   });
   const box = store.getState().box.isOpen;
-  const subject = store.getState().exam.subject;
-  const examCategory = store.getState().exam.exam_category;
+  const subject = useSelector((state: any) => state.subject.subjects);
+  const examCategory = useSelector(
+    (state: any) => state.examCategory.examCategorys
+  );
+  const examCategoryStatus = useSelector(getExamCategorySatus);
+
   const handleClear = () => {
     console.log("Data cleared!");
   };
@@ -37,31 +48,46 @@ const UpdateExam = (props: Props) => {
     ...props.editableExam,
   });
 
+  const subjectStatus = useSelector(getSubjectSatus);
+
+  useEffect(() => {
+    if (subjectStatus === "idle") {
+      dispatch(fetchSubjects());
+    }
+  }, [subjectStatus, dispatch]);
+
+  useEffect(() => {
+    if (examCategoryStatus === "idle") {
+      dispatch(fetchExamCategory());
+    }
+  }, [examCategoryStatus, dispatch]);
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     console.log(Object.fromEntries(formData));
-     const readyToUpload = {
-       ...Object.fromEntries(formData),
-       subject: { id: subjectId },
-       examCategory: { id: examCategoryId },
-      
-     };
-    await updateExam(props.id,JSON.stringify(readyToUpload)).then((res) => {
+    const readyToUpload = {
+      ...Object.fromEntries(formData),
+      subject: { id: subjectId },
+      examCategory: { id: examCategoryId },
+    };
+    await updateExam(props.id, JSON.stringify(readyToUpload)).then((res) => {
       if (res.status === 200) {
-        dispatch(boxAction.showBox(box));
-        setMessage({ msg: "Successfully updated", type: "success" });
+        // dispatch(boxAction.showBox(box));
+        // setMessage({ msg: "Successfully updated", type: "success" });
+        toast.success("Exam Successfuly updated")
+        props.setEditBox(false)
+        fetchExams()
       }
     });
   };
 
-  const handleInputChange = (fieldName, newValue) => {
-    setExamFormData((prevData) => ({
+  const handleInputChange = (fieldName:string, newValue:string) => {
+    setExamFormData((prevData:any) => ({
       ...prevData,
       [fieldName]: newValue,
     }));
   };
-
 
   return (
     <div className=" modal-wrapper">
@@ -123,11 +149,12 @@ const UpdateExam = (props: Props) => {
                 setExamCategoryId(e.target.value);
               }}
             >
-              {examCategory.map((option) => (
-                <option key={option.id} value={option.id}>
-                  {option.title}
-                </option>
-              ))}
+              {examCategory &&
+                examCategory.map((option: any) => (
+                  <option key={option.id} value={option.id}>
+                    {option.title}
+                  </option>
+                ))}
             </select>
           </div>
           <div className="flex flex-col gap-2 ">
@@ -144,11 +171,12 @@ const UpdateExam = (props: Props) => {
               }}
               required
             >
-              {subject.map((option) => (
-                <option key={option.id} value={option.id}>
-                  {option.title}
-                </option>
-              ))}
+              {subject &&
+                subject.map((option: any) => (
+                  <option key={option.id} value={option.id}>
+                    {option.title}
+                  </option>
+                ))}
             </select>
           </div>
 

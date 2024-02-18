@@ -16,12 +16,12 @@ const initialState: StateType = {
 
 };
 
-export const fetchSubjects = createAsyncThunk<any, void>("fetch/data", async () => {
+export const fetchSubjects:any = createAsyncThunk<any[], void>("fetch/subjects", async () => {
   try {
     const response = await getSubject().then((res) => res);
     return [...response];
   } catch (error: any) {
-    return error;
+    return [];
   }
 });
 

@@ -1,6 +1,12 @@
 import { useDispatch, useSelector } from "react-redux";
-import { fetchSubjects, getSubjectSatus, selectAllSubjects } from "../../redux/subjectSlice";
+import {
+  fetchSubjects,
+  getSubjectSatus,
+  selectAllSubjects,
+} from "../../redux/subjectSlice";
 import { useEffect, useState } from "react";
+import Loading from "../../components/loading/Loading";
+import Lists from "../common/Lists";
 
 const SubjectList = () => {
   const dispatch = useDispatch();
@@ -12,6 +18,7 @@ const SubjectList = () => {
       dispatch(fetchSubjects());
     }
   }, [subjectStatus, dispatch]);
+  
   return (
     <div className="  shadow-gray-700 shadow-lg p-4">
       <div className="mb-4">
@@ -19,10 +26,16 @@ const SubjectList = () => {
           <h1 className="rounded-t-md py-2 border-b border-gray-700 font-extrabold text-2xl">
             Subjects
           </h1>
-          
         </div>
-      </div>
 
+        {subjectStatus === "pending" ? (
+          <Loading />
+        ) : subjects.length != 0 ? (
+          <Lists data={subjects} />
+        ) : (
+          <>Error</>
+        )}
+      </div>
     </div>
   );
 };

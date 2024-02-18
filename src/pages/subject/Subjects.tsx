@@ -27,7 +27,7 @@ function Subjects() {
     }
   }, [subjectStatus, dispatch]);
 
-  const box = useSelector((state) => state.box.isOpen);
+  const box = useSelector((state: any) => state.box.isOpen);
 
   return (
     <div className="products ">
@@ -46,28 +46,14 @@ function Subjects() {
       ) : subject.length != 0 ? (
         <DataTable slug={slugs.SUBJECT} columns={columns} rows={subject} />
       ) : (
-        <>Error</>
+        <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 ">
+          Error occered while fetching data check you connection
+        </div>
       )}
 
       {open && <Add slug={slugs.SUBJECT} columns={columns} setOpen={setOpen} />}
     </div>
   );
 }
-
-export const SingleSubject = () => {
-  const { id } = useParams();
-
-  const [singleSubject, setSingleSubject] = useState();
-  useEffect(() => {
-    getSubjectById(id).then((res) => {
-      setSingleSubject(res);
-    });
-  },[]);
-  return (
-    <div>
-      <div></div>
-    </div>
-  );
-};
 
 export default Subjects;

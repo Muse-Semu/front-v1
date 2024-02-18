@@ -5,28 +5,44 @@ import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { Group } from "three/src/Three.js";
 import { useParams } from "react-router-dom";
-interface QuestionFormProps {}
+import { addQuestion } from "../../api/APIService";
+import { toast, ToastContainer } from "react-toastify";
+import { fetchQuestions } from "../../redux/questionSlice";
 
-const QuestionForm: React.FC<QuestionFormProps> = (props) => {
-  const {id} = useParams()
+interface QuestionFormProps {
+  questionCategory: {} | any;
+  open: boolean;
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}
+interface FormData {
+  content: string;
+  option1: string;
+  option2: string;
+  option3: string;
+  option4: string;
+  explanation: string;
+  exam: { id: any };
+}
+const QuestionForm = (props: QuestionFormProps) => {
+  const { id } = useParams();
   const dispatch = useDispatch();
-  const [formData, setFormData] = useState({
+
+  const [formData, setFormData] = useState<FormData>({
     content: "",
-    questionImage: null,
-    answerImage: null,
     option1: "",
     option2: "",
     option3: "",
     option4: "",
-    answer: "",
     explanation: "",
-    exam: {id:id},
-    questionCategory: {},
+    exam: { id: id },
   });
+
+  const [answerIndex, setAnswerIndex] = useState(1);
+  const [questionCategory, setQuestionCategory] = useState(1);
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
-  const handleChange = (field: string, value: string | File) => {
+  const handleChange = (field: string, value: string | File | Number) => {
     setFormData((prevFormData) => ({
       ...prevFormData,
       [field]: value,
@@ -38,43 +54,23 @@ const QuestionForm: React.FC<QuestionFormProps> = (props) => {
     }));
   };
 
-  const handleImageChange = (field, file) => {
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setFormData((prevFormData) => ({
-          ...prevFormData,
-          [field]: file,
-          [`${field}Preview`]: reader.result,
-        }));
-      };
-      reader.readAsDataURL(file);
-    } else {
-      setFormData((prevFormData) => ({
-        ...prevFormData,
-        [field]: null,
-        [`${field}Preview`]: null,
-      }));
-    }
-  };
+  const handleAnswerChange = () => {};
 
-  const handleRemoveImage = (field) => {
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      [field]: null,
-      [`${field}Preview`]: null,
-    }));
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const requiredFields = ["content", "option1"];
+    const requiredFields: string[] = [
+      "option1",
+      "option2",
+      "option3",
+      "option4",
+      "content",
+      "explanation",
+    ];
     const newErrors: { [key: string]: string } = {};
-
     let hasErrors = false;
 
-    requiredFields.forEach((field) => {
+    requiredFields.forEach((field: string) => {
       if (!formData[field]) {
         newErrors[field] = "This field is required";
         hasErrors = true;
@@ -86,12 +82,25 @@ const QuestionForm: React.FC<QuestionFormProps> = (props) => {
       return;
     }
 
-    readyToUpload = {}
-    // Add your form submission logic here
-    console.log("Form submitted with data:", formData);
+    const toBeSent = {
+      ...formData,
+      options: [
+        formData.option1,
+        formData.option2,
+        formData.option3,
+        formData.option4,
+      ],
+      answerIndex: answerIndex,
+      questionCategory: { id: questionCategory },
+    };
 
-    const form = new FormData(e.currentTarget);
-    //  console.log(Object.fromEntries(form));
+    await addQuestion(toBeSent).then((res) => {
+      if (res.status == 200) {
+        props.setOpen(false);
+        toast.success("Successfully addeed");
+        dispatch(fetchQuestions());
+      }
+    });
   };
 
   return (
@@ -100,11 +109,11 @@ const QuestionForm: React.FC<QuestionFormProps> = (props) => {
         <div className="mb-5 shadow-md sticky top-0 bg-inherit p-4  border-inherit">
           <span
             className="close absolute top-4 right-2 cursor-pointer"
-            onClick={() => dispatch(boxAction.showBox(true))}
+            onClick={() => props.setOpen(false)}
           >
             <MdClose size={25} />
           </span>
-          <h1 className=" text-2xl font-extrabold">Add New Question</h1>
+          <h1 className=" text-2xl font-extrabold">Add New Question </h1>
         </div>
         <form onSubmit={handleSubmit} className="form-container">
           {questionFormFields.map((field) => (
@@ -117,84 +126,63 @@ const QuestionForm: React.FC<QuestionFormProps> = (props) => {
               } `}
             >
               <label className="form-label">{field.label}</label>
-              {field.type === "file" ? (
-                <>
-                  {!formData[`${field.field}Preview`] && (
-                    <label className=" cursor-pointer  flex items-center justify-center ">
-                      <div className="rounded-md flex flex-col gap-1  w-full items-center justify-center border-dashed border ">
-                        <h1>upload image</h1> <MdImage size={25} />
-                      </div>
-                      <input
-                        type="file"
-                        className=" hidden"
-                        accept="image/*"
-                        onChange={(e) =>
-                          handleImageChange(field.field, e.target.files[0])
-                        }
-                      />
-                    </label>
-                  )}
-                  {formData[`${field.field}Preview`] && (
-                    <div className="label-with-input relative">
-                      <img
-                        src={formData[`${field.field}Preview`]}
-                        alt={`${field.label} Preview`}
-                        className="w-full object-cover h-[100px]"
-                      />
-                      <div
-                        onClick={(e) => {
-                          handleRemoveImage(field.field);
-                        }}
-                        className="absolute font-extrabold  cursor-pointer right-1 top-1  h-[30px] w-[30px] bg-red-500 hover:bg-red-600 rounded-full flex items-center justify-center"
-                      >
-                        <MdClose/>
-                      </div>
-                    </div>
-                  )}
-                </>
-              ) : field.type === "select" ? (
-                <select
-                  value={formData[field.field]}
-                  onChange={(e) => handleChange(field.field, e.target.value)}
-                  className="form-select"
-                >
-                  {field.field === "questionCategory" &&
-                    props.questionCategory.map((item) => (
-                      <option key={item.id}>{item.title}</option>
-                    ))}
-                  {field.field === "answer" &&
-                    questionFormFields
-                      .filter((field) => field.group === "option")
-                      .map((item) => (
-                        <option key={item.id} value={item.id}>{item.label}</option>
-                      ))}
 
-                  {field.field === "questionCategory" &&
-                    props.questionCategory.map((item) => (
-                      <option key={item.id}>{item.title}</option>
-                    ))}
-                </select>
-              ) : (
-                <textarea
-                  className="col-span-2 form-input"
-                  value={formData[field.field]}
-                  onChange={(e) => handleChange(field.field, e.target.value)}
-                  rows={3}
-                />
-              )}
+              <textarea
+                className="col-span-2 form-input"
+                value={formData[field.field]}
+                onChange={(e) => handleChange(field.field, e.target.value)}
+                rows={3}
+              />
 
               {errors[field.field] && (
                 <p style={{ color: "red" }}>{errors[field.field]}</p>
               )}
             </div>
           ))}
+
+          <div className="label-with-input">
+            <label htmlFor="" className="form-label">
+              Answer
+            </label>
+            <select
+              className="form-select"
+              name=""
+              id=""
+              value={answerIndex}
+              onChange={(e) => setAnswerIndex(e.target.value)}
+            >
+              {questionFormFields
+                .filter((field) => field.group === "option")
+                .map((item) => (
+                  <option key={item.id} value={item.id}>
+                    {item.label}
+                  </option>
+                ))}
+            </select>
+          </div>
+          <div className="label-with-input">
+            <label htmlFor="" className="form-label">
+              QuestionCategory
+            </label>
+            <select
+              className="form-select"
+              name=""
+              id=""
+              value={questionCategory}
+              onChange={(e) => setQuestionCategory(e.target.value)}
+            >
+              {props.questionCategory.map((category: any) => (
+                <option key={category.id} value={category.id}>
+                  {category.title}
+                </option>
+              ))}
+            </select>
+          </div>
           <div className="form-btn-div">
             <button type="submit" className="submit-btn">
               Submit
             </button>
-            <button type="submit" className="remove-btn">
-              Clear
-            </button>
+            <div className="remove-btn">Clear</div>
           </div>
         </form>
       </div>

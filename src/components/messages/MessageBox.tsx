@@ -6,9 +6,10 @@ type Props = {
 }
 function MessageBox(props:Props) {
   const dispatch = useDispatch()
-
+  const box = useSelector((state:any)=>state.box.isOpen)
   return (
     <div className="modal-wrapper">
+
       <div className="msg-box ">
 
         <div className={`flex p-2 ${props.message.type.toLowerCase()==="error"?'bg-red-500':'bg-green-500'} items-center justify-between font-bold gap-2  `}>
@@ -18,7 +19,7 @@ function MessageBox(props:Props) {
           </div>
           <button
             className="rounded p-1"
-            onClick={() => dispatch(boxAction.showBox())}
+            onClick={() => dispatch(boxAction.showBox(box))}
           >
             <MdClose size={25}/>
           </button>

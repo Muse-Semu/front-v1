@@ -5,16 +5,16 @@ export const questionFormFields = [
     label: "Content",
     maxLength: 50000,
   },
-  {
-    field: "questionImage",
-    type: "file",
-    label: "Question Image",
-  },
-  {
-    field: "answerImage",
-    type: "file",
-    label: "Answer Image",
-  },
+  // {
+  //   field: "questionImage",
+  //   type: "file",
+  //   label: "Question Image",
+  // },
+  // {
+  //   field: "answerImage",
+  //   type: "file",
+  //   label: "Answer Image",
+  // },
 
   {
     id: 1,
@@ -45,21 +45,22 @@ export const questionFormFields = [
     group: "option",
   },
 
-  {
-    field: "answer",
-    type: "select",
-    label: "Answer",
-  },
+  // {
+  //   field: "answerIndex",
+  //   type: "select",
+  //   label: "Answer",
+   
+  // },
   {
     field: "explanation",
     type: "text-area",
     label: "Explanation",
     maxLength: 50000,
   },
-  
-  {
-    field: "questionCategory",
-    type: "select",
-    label: "Question Category",
-  },
+
+  // {
+  //   field: "questionCategory",
+  //   type: "select",
+  //   label: "Question Category",
+  // },
 ];

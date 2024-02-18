@@ -15,14 +15,14 @@ function SingleExamCategory() {
     getExamCategoryById(id).then((res) => {
       setSingleExamCategory(res.data);
     });
-  }, []);
+  }, [singleExamCategory]);
 
   return (
-    <div>
-      <div>
-        <div className="header"> Exam Information </div>
+    <div className="">
+      <div className="grid gap-3">
+        <div className="header p-3 "> Exam Category Information </div>
         {singleExamCategory && (
-          <div>
+          <div className="box-c">
             <div>
               <h1>
                 {singleExamCategory.title} {singleExamCategory.id}
@@ -33,7 +33,7 @@ function SingleExamCategory() {
               <h1>{singleExamCategory.description}</h1>
             </div>
             <div>
-              <button className="" onClick={() => setEditBox(true)}>
+              <button className="edit-btn" onClick={() => setEditBox(true)}>
                 Update
               </button>
             </div>

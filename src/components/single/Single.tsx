@@ -1,34 +1,41 @@
+import { useNavigate, useParams } from "react-router-dom";
 import { slugs } from "../../constant";
 import "./single.scss";
+import { useDispatch, useSelector } from "react-redux";
 
 type Props = {
-  data: Object;
-  slug:string
+  data: any;
+  slug: string;
 };
 
 const Single = (props: Props) => {
   console.log(props.data);
-  
+  const {id} = useParams()
+  const navigate = useNavigate()
+  const dispatch = useDispatch()
+  const box = useSelector((state:any)=>state.box.isOpen)
   return (
     <div className="single">
       <div className="view">
         <div className="info">
-        
-          <div className="header">
-          {`${props.slug.toUpperCase()} INFORMATION`}
+          <div className="header ">
+            {`${props.slug.toUpperCase()} INFORMATION`}
           </div>
-          <div>
-            {props.slug === slugs.EXAM && (<div>
-              <h1>{props.data.title}</h1>
-              <h1>{props.data.givenTime}</h1>
-              <h1>{props.data.examCategory.title}</h1>
-              <h1>{props.data.subject.title}</h1>
-            </div>)}
+          <div className="">
+            {props.slug === slugs.EXAM ? (
+              <div>
+                <h1>{props.data.title}</h1>
+                <h1>{props.data.givenTime}</h1>
+                <h1>{props.data.examCategory.title}</h1>
+                <h1>{props.data.subject.title}</h1>
+              </div>
+            ) : (
+              <></>
+            )}
           </div>
           {}
         </div>
       </div>
-      
     </div>
   );
 };

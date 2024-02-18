@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import { getSubjectById } from "../../api/APIService";
 import { slugs } from "../../constant";
 import { columns } from "./columns";
-import Update from "../../components/crud/Update";
+import UpdateSubject from "./UpdateSubject";
 
 function SingleSubject() {
   const { id } = useParams();
@@ -13,7 +13,6 @@ function SingleSubject() {
 
   useEffect(() => {
     getSubjectById(id).then((res) => {
-      console.log(res.data);
       setSingleSubject(res.data);
     });
   }, []);
@@ -24,22 +23,21 @@ function SingleSubject() {
         {/* {singleExam && (<Single data = {singleExam} slug={slugs.EXAM}/>)} */}
         <div>
           <div>
-            <div className="header"> Exam Information </div>
+            <div className="header"> Subject Information </div>
             {singleSubject && (
-              <div>
+              <div className="box-c">
                 <div>
-                  <h1>
-                    {singleSubject.title} {singleSubject.id}
-                  </h1>
+                  <h1>{singleSubject.title}</h1>
                 </div>
                 <div>{/* <h1>{singleSubject.Subject.title}</h1> */}</div>
                 <div>
                   <h1>{singleSubject.description}</h1>
                 </div>
-                <div>
-                  <button className="" onClick={() => setEditBox(true)}>
+                <div className="flex gap-2 items-center">
+                  <button className="edit-btn" onClick={() => setEditBox(true)}>
                     Update
                   </button>
+                  <button className="normal-btn hover-c"> View Chapters</button>
                 </div>
               </div>
             )}
@@ -47,8 +45,8 @@ function SingleSubject() {
         </div>
       </div>
       {editBox && (
-        <Update
-          editableExam={singleSubject}
+        <UpdateSubject
+          editableSubject={singleSubject}
           title={singleSubject.title}
           slug={slugs.SUBJECT}
           columns={columns}

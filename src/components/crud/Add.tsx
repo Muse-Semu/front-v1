@@ -245,16 +245,13 @@ const Add = (props: Props) => {
             </>
           )}
 
-          <div className="from-btn-div">
-            <button className="submit-btn" type="submit">
-              Add
+          <div className="form-btn-div">
+            <button type="submit" className="submit-btn">
+              Submit
             </button>
-            <span
-              className="remove-btn "
-              onClick={handleClear}
-            >
+            <div  className="remove-btn">
               Clear
-            </span>
+            </div>
           </div>
         </form>
       </div>

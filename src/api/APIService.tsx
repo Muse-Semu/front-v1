@@ -1,3 +1,4 @@
+import { refresh_token } from "../service/localStorage";
 import { baseUrl } from "./http-common";
 
 // ********************** EXAMS **************************************** //
@@ -8,7 +9,7 @@ export const getExams = async () => {
 };
 
 // Get Single exam by id
-export const getExamById = async (id: number) => {
+export const getExamById = async (id: any) => {
   return await baseUrl.get(`/exam/${id}`);
 };
 
@@ -50,8 +51,8 @@ export const getExamQuestions = async (examId: number) => {
 //********************** EXAM_CATEGORY ********************** //
 
 // Get all exam_category list
-export const getExamCategory = () => {
-  return baseUrl.get("/exam_category").then((res) => res.data);
+export const getExamCategory = async () => {
+  return await baseUrl.get("/exam_category").then((res) => res.data);
 };
 
 // Get single exam_category by Id
@@ -107,6 +108,36 @@ export const addUser = async (data: {}) => {
   return user;
 };
 
+export const getUserDetail = async (email: string, token: string) => {
+  console.log("Recieved token @ detail", token);
+  return await baseUrl.get(`/user/detail/${email}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  });
+};
+
+export const getUserById = async (id: number, token: string) => {
+  console.log("Recieved Token", token);
+  return await baseUrl.get(`/user/get/${id}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  });
+};
+
+export const getAllUser = async (token: any) => {
+  console.log("Recieved token ", token);
+  return await baseUrl.get("/user", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  });
+};
+
 // ********************** END USER ********************** //
 
 // localhost: 8082 / api / question / category;
@@ -115,7 +146,7 @@ export const addUser = async (data: {}) => {
 
 // Add new question
 export const addQuestion = (data: {}) => {
-  return baseUrl.post(`/question`);
+  return baseUrl.post(`/question`, data);
 };
 // Get question
 export const getQuestions = () => {
@@ -128,7 +159,7 @@ export const getQuestionById = (id: number) => {
 
 // Update the question
 export const updateQuestion = (id: number, data: {}) => {
-  return baseUrl.put(`/question/${id}`, data);
+  return baseUrl.put(`/question/update/${id}`, data);
 };
 
 export const deleteQuestion = (id: number) => {
@@ -137,12 +168,11 @@ export const deleteQuestion = (id: number) => {
 
 // ********************** END QUESTION ********************** //
 
-
 //********************** QUESTION_CATEGORY ********************** //
 
 // Get all exam_category list
-export const getQuestionCategory = () => {
-  return baseUrl.get("/question/category").then((res) => res.data);
+export const getQuestionCategory = async () => {
+  return await baseUrl.get("/question/category").then((res) => res.data);
 };
 
 // Get single question_category by Id
@@ -165,5 +195,18 @@ export const updateQuestionCategory = async (categoryId: number, data: {}) => {
 
 //********************** END question_CATEGORY ********************** //
 
+//********************** AUTHENTICATION ********************** //
+export const login = async (data: {}) => {
+  return await baseUrl.post("/auth/authenticate", data);
+};
 
+export const getNewAccessToken = async (refresh_token: any) => {
+  // console.log("Refresh_token : ", refresh_token);
 
+  return await baseUrl.post(`/auth/refresh_token`, refresh_token, {
+    headers: {
+      Authorization: `Bearer ${refresh_token}`,
+      "Content-Type": "application/json",
+    },
+  });
+};

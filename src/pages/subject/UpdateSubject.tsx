@@ -1,27 +1,22 @@
 import { GridColDef } from "@mui/x-data-grid";
 import { MdClose } from "react-icons/md";
 import React, { useState } from "react";
-import { updateExamCategory } from "../../api/APIService";
+import { updateSubject } from "../../api/APIService";
 import MessageBox from "../../components/messages/MessageBox";
 import store from "../../redux/Store";
 import { useDispatch } from "react-redux";
 import { boxAction } from "../../redux/boxSlice";
-import { fetchExamCategory } from "../../redux/examCategorySlice";
 
 type Props = {
   id: number;
   title: string;
   slug: string;
   columns: GridColDef[];
-  editbaleExamCategory: {
-    id: number;
-    title: string;
-    description: string;
-  };
+  editableSubject: any;
   setEditBox: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-const UpdateExamCategory = (props: Props) => {
+const UpdateSubject = (props: Props) => {
   const dispatch = useDispatch();
 
   const [message, setMessage] = useState({
@@ -33,31 +28,25 @@ const UpdateExamCategory = (props: Props) => {
     console.log("Data cleared!");
   };
 
-  const [examCategoryFormData, setExamCategoryFormData] = useState({
-    title: props.editbaleExamCategory.title,
-    description: props.editbaleExamCategory.description,
+  const [subjectFormData, setSubjectFormData] = useState({
+    title: props.editableSubject.title,
+    description: props.editableSubject.description,
   });
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
 
-    await updateExamCategory(props.id, formData).then((res) => {
+    await updateSubject(props.id, formData).then((res) => {
       if (res.status === 200) {
         dispatch(boxAction.showBox(box));
         setMessage({ msg: "Successfully updated", type: "success" });
-        setTimeout(() => {
-          props.setEditBox(false);
-          dispatch(boxAction.showBox(box));
-        }, 1000);
-
-        dispatch(fetchExamCategory());
       }
     });
   };
 
-  const handleInputChange = (fieldName: string, newValue: string) => {
-    setExamCategoryFormData((prevData) => ({
+  const handleInputChange = (fieldName, newValue) => {
+    setSubjectFormData((prevData) => ({
       ...prevData,
       [fieldName]: newValue,
     }));
@@ -98,7 +87,7 @@ const UpdateExamCategory = (props: Props) => {
                   type={column.type}
                   placeholder={column.field}
                   name={column.field}
-                  value={examCategoryFormData[column.field]}
+                  value={subjectFormData[column.field]}
                   onChange={(event) =>
                     handleInputChange(column.field, event.target.value)
                   }
@@ -124,4 +113,4 @@ const UpdateExamCategory = (props: Props) => {
   );
 };
 
-export default UpdateExamCategory;
+export default UpdateSubject;

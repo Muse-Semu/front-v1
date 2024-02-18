@@ -1,9 +1,11 @@
-
-const Lists = () => {
+type Props = {
+  data:{}
+}
+const Lists = (props:Props) => {
   return (
     <div>
       <div className="gap-y-6 gap-x-3 grid grid-cols-1 sm:mr-3  xl:grid-cols-4 lg:grid-cols-2 md:grid-cols-1 ">
-        {subjects.map((subject, index) => (
+        {props.data && props.data.map((subject, index) => (
           <div key={subject.id} className=" rounded-md  shadow-white shadow-sm">
             <div className="">
               <div

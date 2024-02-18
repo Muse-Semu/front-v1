@@ -1,48 +1,112 @@
-import { createSlice } from "@reduxjs/toolkit";
-import { loginStatus } from "../service/localStorage";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import {
+  getNewAccessToken,
+  getUserDetail,
+  login,
+  refreshToken,
+} from "../api/APIService";
+import { jwtDecode } from "jwt-decode";
+import { access_token, refresh_token } from "../service/localStorage";
 
-const loggedUser = loginStatus();
-const authSlice = createSlice({
+export const loginRequest = createAsyncThunk(
+  "auth/login",
+  async (credentials: { username: string; password: string }) => {
+    const response: any = login(credentials);
+    return response.data;
+  }
+);
+
+const generateNewToken = async (refreshToken) => {
+  const decoder: {} | any = refreshToken && jwtDecode(refreshToken);
+  if (decoder.exp < Math.floor(Date.now() / 1000)) {
+    return;
+  }
+  const op = await getNewAccessToken(refreshToken).then(
+    (res) => res.data.access_token
+  );
+  console.log("response of refresh_token:", op);
+
+  return op;
+};
+
+export const loginStatus = async () => {
+  const token = access_token;
+  const decoder: {} | any = token && jwtDecode(token);
+  if (decoder.exp < Math.floor(Date.now() / 1000)) {
+    console.log("Token is expired please , Login again!");
+    const refreshToken = refresh_token;
+    const new_token = refreshToken && (await generateNewToken(refreshToken));
+    localStorage.setItem("access_token", new_token);
+    const refresh = new_token && jwtDecode(new_token);
+    console.log("refresh", refresh);
+    return refresh;
+  } else {
+    return decoder && decoder;
+  }
+};
+
+export const getUser: any = createAsyncThunk("auth/user_detail", async () => {
+  const user: any = loginStatus();
+  const response = user ? await getUserDetail(user && user.sub) : null;
+  // console.log(response);
+  return response && response.data;
+});
+
+export const logout = createAsyncThunk("auth/logout", async () => {
+  localStorage.clear();
+});
+const initialState = {
+  user: {},
+  isLoading: false,
+  hasError: false,
+  errorMessage: "",
+  isAuthenticated: false,
+};
+
+export const authSlice = createSlice({
   name: "auth",
-  initialState: {
-    loginForm: false,
-    register: false,
-    user: {
-      isLoggedIn: loggedUser ? true : false,
-      username: loggedUser && loggedUser.username,
-      user_role: loggedUser && loggedUser.role,
-      user_id: loggedUser && loggedUser.user_id,
-      email: loggedUser && loggedUser.email,
-    },
-  },
-  reducers: {
-    login: (state, action) => {
-      state.user.username = action.payload.username;
-      state.user.isLoggedIn = true;
-      state.user.user_role = action.payload.role;
-      state.user.user_id = action.payload.user_id;
-      state.user.email = action.payload.email;
-    },
-    logout: (state, action) => {
-      state.user.isLoggedIn = false;
-      state.user.user_id = null;
-      state.user.username = null;
-      state.user.user_role = null;
-      localStorage.removeItem("token");
-      localStorage.removeItem("rest");
-      localStorage.removeItem("menu");
-    },
-    showLogin: (state) => {
-      state.loginForm = !state.loginForm;
-    },
-    showRegisterForm: (state) => {
-      state.register = !state.register;
-    },
+  initialState,
+  reducers: {},
+  extraReducers: (builder) => {
+    builder
+      .addCase(loginRequest.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(loginRequest.fulfilled, (state, action) => {
+        state.isLoading = false;
+      })
+      .addCase(loginRequest.rejected, (state, action) => {
+        state.isLoading = false;
+        state.hasError = true;
+        state.errorMessage =
+          action.error.message || "An error occurred during login.";
+      })
 
-    updateToken: (state) => {},
+      .addCase(getUser.pending, (state) => {
+        state.isLoading = true;
+      })
+
+      .addCase(getUser.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.user = action.payload;
+        state.isAuthenticated = true;
+      })
+
+      .addCase(logout.pending, (state) => {
+        // Start logout loading state
+      })
+      .addCase(logout.fulfilled, (state) => {
+        state = initialState;
+      })
+      .addCase(logout.rejected, (state, action) => {
+        // Handle logout error
+      });
   },
 });
 
-export const authActions = authSlice.actions;
-
-export default authSlice;
+export const selectUser = (state: any) => state.auth.user;
+export const selectIsLoading = (state: any) => state.auth.isLoading;
+export const selectHasError = (state: any) => state.auth.hasError;
+export const selectErrorMessage = (state: any) => state.auth.errorMessage;
+export const authenticated = (state: any) => state.auth.isAuthenticated;
+export default authSlice.reducer;

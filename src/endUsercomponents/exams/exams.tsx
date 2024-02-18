@@ -3,7 +3,6 @@ import DataTable from "../../components/dataTable/DataTable";
 import Add from "../../components/crud/Add";
 import { useDispatch, useSelector } from "react-redux";
 import Loading from "../../components/loading/Loading";
-import { columns } from "./columns";
 import { slugs } from "../../constant";
 import {
   fetchExams,
@@ -13,7 +12,7 @@ import {
 import store from "../../redux/Store";
 import { selectAllExamCategorys } from "../../redux/examCategorySlice";
 import { selectAllSubjects } from "../../redux/subjectSlice";
-// import type { RootState, AppDispatch } from "../../redux/Store";
+import Lists from "../common/Lists";
 
 function Exams() {
   const dispatch = useDispatch();
@@ -22,7 +21,6 @@ function Exams() {
   const examStatus = useSelector(getExamSatus);
   const exam = useSelector(selectAllExams);
   const subject = useSelector(selectAllSubjects);
-
   const examCategory = useSelector(selectAllExamCategorys);
 
   useEffect(() => {
@@ -32,10 +30,13 @@ function Exams() {
   }, [examStatus, dispatch]);
 
   return (
-    <div className="">
+    <div className="products ">
       <div className="header sticky top-0 ">
         <h1 className="header-txt">Exams</h1>
-        <button className="normal-btn" onClick={() => setOpen(true)}>
+        <button
+          className="px-3 py-2 cursor-pointer rounded-md border"
+          onClick={() => setOpen(true)}
+        >
           Add New Exam
         </button>
       </div>
@@ -43,22 +44,14 @@ function Exams() {
       {examStatus === "pending" ? (
         <Loading />
       ) : exam.length != 0 ? (
-        <DataTable slug="exams" columns={columns} rows={exam} />
+        <Lists data = {exam}/>
       ) : (
         <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 ">
           Error occered while fetching data check you connection
         </div>
       )}
 
-      {open && (
-        <Add
-          slug={slugs.EXAM}
-          subject={subject}
-          examCategory={examCategory}
-          columns={columns}
-          setOpen={setOpen}
-        />
-      )}
+      
     </div>
   );
 }

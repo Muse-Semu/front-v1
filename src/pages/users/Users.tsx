@@ -1,67 +1,29 @@
 import { GridColDef } from "@mui/x-data-grid";
 import DataTable from "../../components/dataTable/DataTable";
 import "./users.scss";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Add from "../../components/crud/Add";
-import { userRows } from "../../data";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  fetchUsers,
+  getUserStatus,
+  selectAllusers,
+} from "../../redux/userSlice";
+import { columns } from "./Columns";
+import Loading from "../../components/loading/Loading";
+import { slugs } from "../../constant";
 // import { useQuery } from "@tanstack/react-query";
-
-const columns: GridColDef[] = [
-  { field: "id", headerName: "ID", width: 90 },
-  {
-    field: "img",
-    headerName: "Image",
-    width: 100,
-    renderCell: (params) => {
-      return <img src={params.row.img || "/noavatar.png"} alt="" />;
-    },
-  },
-  {
-    field: "firstName",
-    type: "string",
-    headerName: "First name",
-    width: 150,
-  },
-  {
-    field: "lastName",
-    type: "string",
-    headerName: "Last name",
-    width: 150,
-  },
-  {
-    field: "email",
-    type: "string",
-    headerName: "Email",
-    width: 200,
-  },
-  {
-    field: "phone",
-    type: "string",
-    headerName: "Phone",
-    width: 200,
-  },
-  {
-    field: "createdAt",
-    headerName: "Created At",
-    width: 200,
-    type: "string",
-  },
-  {
-    field: "verified",
-    headerName: "Verified",
-    width: 150,
-    type: "boolean",
-  },
- {
-  field:"role",
-  headerName:"Role",
-  type:"string"
- }
-];
 
 const Users = () => {
   const [open, setOpen] = useState(false);
-
+  const users = useSelector(selectAllusers);
+  const dispatch = useDispatch();
+  const userStatus = useSelector(getUserStatus);
+  useEffect(() => {
+    if (userStatus === "idle") {
+      dispatch(fetchUsers());
+    }
+  }, [userStatus, dispatch]);
   // TEST THE API
 
   // const { isLoading, data } = useQuery({
@@ -71,6 +33,7 @@ const Users = () => {
   //       (res) => res.json()
   //     ),
   // });
+  console.log("user:", users);
 
   return (
     <div className="users">
@@ -80,15 +43,20 @@ const Users = () => {
           Add New User
         </button>
       </div>
-      <DataTable slug="users" columns={columns} rows={userRows} />
+      {/* <DataTable slug="users" columns={columns} rows={users && users} /> */}
       {/* TEST THE API */}
 
-      {/* {isLoading ? (
-        "Loading..."
+      {userStatus === "pending" ? (
+        <Loading />
+      ) : users.length != 0 ? (
+        <DataTable slug={slugs.USER} columns={columns} rows={users} />
       ) : (
-        <DataTable slug="users" columns={columns} rows={data} />
-      )} */}
-      {open && <Add slug="user" columns={columns} setOpen={setOpen} />}
+        <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 ">
+          Error occered while fetching data check you connection
+        </div>
+      )}
+
+      {open && <Add slug={slugs.USER} columns={columns} setOpen={setOpen} />}
     </div>
   );
 };

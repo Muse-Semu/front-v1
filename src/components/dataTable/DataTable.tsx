@@ -1,8 +1,4 @@
-import {
-  DataGrid,
-  GridColDef,
-  GridToolbar,
-} from "@mui/x-data-grid";
+import { DataGrid, GridColDef, GridToolbar } from "@mui/x-data-grid";
 import "./dataTable.scss";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -18,10 +14,10 @@ type Props = {
 };
 
 const DataTable = (props: Props) => {
-    const navigate = useNavigate()
-    const dispatch = useDispatch()
-    const confirmBox = useSelector(state=>state.box.isConfirmBox)
-    
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const confirmBox = useSelector((state: any) => state.box.isConfirmBox);
+
   // TEST THE API
 
   // const queryClient = useQueryClient();
@@ -37,11 +33,9 @@ const DataTable = (props: Props) => {
   // // });
 
   const handleDelete = (id: number) => {
-   dispatch(boxAction.showConfirmBox(confirmBox))
-   
-   console.log(id,confirmBox);
-   
+    dispatch(boxAction.showConfirmBox(confirmBox));
 
+    console.log(id, confirmBox);
   };
 
   const actionColumn: GridColDef = {
@@ -50,8 +44,8 @@ const DataTable = (props: Props) => {
     width: 100,
     renderCell: (params) => {
       return (
-        <div className="action" >
-          <button onClick={()=>navigate(`/${props.slug}/${params.row.id}`)} >
+        <div className="action">
+          <button onClick={() => navigate(`/${props.slug}/${params.row.id}`)}>
             <img src="/view.svg" alt="" />
           </button>
           <div className="delete" onClick={() => handleDelete(params.row.id)}>
@@ -88,10 +82,10 @@ const DataTable = (props: Props) => {
         disableColumnFilter
         disableDensitySelector
         disableColumnSelector
-        onCellClick={(params)=>{navigate(`/${props.slug}/${params.row.id}`)
-         console.log(props.slug);
+        onCellClick={(params) => {
+          navigate(`/${props.slug}/${params.row.id}`);
+          console.log("Current Slug is :", props.slug);
         }}
-        
       />
       {confirmBox && (
         <ConfirmBox message={{ type: "error", msg: "Are you sure to " }} />

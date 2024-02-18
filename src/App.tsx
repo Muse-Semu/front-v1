@@ -1,4 +1,9 @@
-import { createBrowserRouter, RouterProvider, Outlet } from "react-router-dom";
+import {
+  createBrowserRouter,
+  RouterProvider,
+  Outlet,
+  Navigate,
+} from "react-router-dom";
 import Users from "./pages/users/Users";
 import Navbar from "./components/navbar/Navbar";
 import Footer from "./components/footer/Footer";
@@ -8,8 +13,7 @@ import "./styles/global.scss";
 import Product from "./pages/product/Product";
 
 import "./index.css";
-import { QueryClient } from "@tanstack/react-query";
-import Subjects, { SingleSubject } from "./pages/subject/Subjects";
+import Subjects from "./pages/subject/Subjects";
 import SingleExam from "./pages/exams/SingleExam";
 import Exams from "./pages/exams/Exams";
 import SubjectList from "./endUsercomponents/subjects/Subjects";
@@ -17,22 +21,48 @@ import SingleUser from "./pages/users/SingleUser";
 import { slugs } from "./constant";
 import ExamCategory from "./pages/category/ExamCategory";
 import SingleExamCategory from "./pages/category/SingleExamCategory";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import Questions from "./pages/questions/Questions";
+import SingleSubject from "./pages/subject/SingleSubject";
+import { useEffect } from "react";
+import Home from "./pages/home/Home";
+import { access_token, refresh_token } from "./service/localStorage";
 
 function App() {
-  const box = useSelector((state)=>state.box.isOpen)
+  const currentUser = useSelector((state: any) => state.authentication.user);
+  const authenticated = useSelector(
+    (state: any) => state.authentication.isAuthenticated
+  );
+  const access_token = useSelector(
+    (state: any) => state.authentication.access_token
+  );
+  const dispatch = useDispatch();
+  console.log(currentUser, authenticated);
+
+  const acess = localStorage.getItem("access_token");
+
+  console.log("Access token", acess);
+
+  const ProtectedRoute = ({ role }) => {
+    if (!authenticated) {
+      return <Navigate to="/login" replace={true} />;
+    }
+    else if(authenticated) {
+      return <Outlet />;
+    }
+  };
+
   const Layout = () => {
     return (
       <div className="main ">
-        <Navbar />
-       
+        <Navbar user={currentUser} />
+
         <div className="grid grid-cols-6 gap-1  ">
           <div className="ml-2  col-span-1 top-5 mt-5 h-screen ">
             <Menu />
           </div>
           <div className=" col-span-5 mr-4 mt-3  ">
-            <Outlet />
+            <ProtectedRoute role={currentUser?.role} />
           </div>
         </div>
         <Footer />
@@ -50,8 +80,12 @@ function App() {
           element: <SubjectList />,
         },
         {
-          path: "/users",
+          path: `${slugs.USER}/`,
           element: <Users />,
+        },
+        {
+          path: `${slugs.USER}/:id`,
+          element: <SingleUser />,
         },
         {
           path: `${slugs.EXAM}/`,
@@ -94,6 +128,9 @@ function App() {
     {
       path: "/login",
       element: <Login />,
+    },
+    {
+      path: "/register",
     },
   ]);
 
