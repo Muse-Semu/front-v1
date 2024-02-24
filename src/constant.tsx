@@ -6,5 +6,6 @@ export const slugs = {
   QUESTION_CATEGORY: "questionCategorys",
   EXAM_CATEGORY: "examCategorys",
   LOGIN:'login',
+  SIGNUP:"signup"
   
 };

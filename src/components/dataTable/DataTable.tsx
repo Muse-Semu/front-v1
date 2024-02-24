@@ -57,7 +57,7 @@ const DataTable = (props: Props) => {
   };
 
   return (
-    <div className="dataTable">
+    <div className="dataTable p-2">
       <DataGrid
         className="dataGrid"
         rows={props.rows}

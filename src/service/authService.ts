@@ -18,10 +18,5 @@ export const loginUser = async (username: string, password: string) => {
   }
 };
 
-export const logoutUser = () => {
-  localStorage.removeItem("accessToken");
-  localStorage.removeItem("refreshToken");
-  dispatch(logout());
-};
 
 // Implement refreshToken logic here

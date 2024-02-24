@@ -8,6 +8,10 @@ import MessageBox from "../messages/MessageBox";
 import { addExamCategory, addExam, addSubject } from "../../api/APIService";
 import axios from "axios";
 import { slugs } from "../../constant";
+import { toast } from "react-toastify";
+import { fetchExamCategory } from "@/redux/examCategorySlice";
+import { fetchSubjects } from "@/redux/subjectSlice";
+import { fetchExams } from "@/redux/examSlice";
 
 type Props = {
   slug: string;
@@ -26,22 +30,22 @@ const Add = (props: Props) => {
     type: "",
     msg: "",
   });
-  const [image, setImage] = useState(null);
-  const [imageUploading, setImageUploading] = useState(null);
-  const [imageUrl, setImageUrl] = useState("");
+  // const [image, setImage] = useState(null);
+  // const [imageUploading, setImageUploading] = useState(null);
+  // const [imageUrl, setImageUrl] = useState("");
 
-  const handleUploadChange = (e) => {
-    const imageFile = e.target.files[0];
-    const reader = new FileReader();
+  // const handleUploadChange = (e) => {
+  //   const imageFile = e.target.files[0];
+  //   const reader = new FileReader();
 
-    reader.onload = () => {
-      setImage(reader.result);
-    };
-    if (imageFile) {
-      reader.readAsDataURL(imageFile);
-    }
-    setImageUploading(imageFile);
-  };
+  //   reader.onload = () => {
+  //     setImage(reader.result);
+  //   };
+  //   if (imageFile) {
+  //     reader.readAsDataURL(imageFile);
+  //   }
+  //   setImageUploading(imageFile);
+  // };
 
   const handleClear = () => {
     console.log("Data cleared!");
@@ -52,53 +56,58 @@ const Add = (props: Props) => {
     const formData = new FormData(e.currentTarget);
     console.log(Object.fromEntries(formData));
 
-    if (imageUploading) {
-      formData.append("file", imageUploading);
-      await axios
-        .post("http://localhost:8082/api/uploads", formData)
-        .then((res) => {
-          setImageUrl(res.data.url);
-        })
-        .catch((e) => console.log(e.message));
-    }
+    // if (imageUploading) {
+    //   formData.append("file", imageUploading);
+    //   await axios
+    //     .post("http://localhost:8082/api/uploads", formData)
+    //     .then((res) => {
+    //       setImageUrl(res.data.url);
+    //     })
+    //     .catch((e) => console.log(e.message));
+    // }
 
     const handleApiCall = async (
       apiFunction: any,
       slug: string,
-      additionalData: {}
+      additionalData: {},
+      fetch: any
     ) => {
       try {
-        const response = await apiFunction(
-          slug === slugs.EXAM ? JSON.stringify(additionalData) : formData
-        );
+                console.log("Ready to upload *:", additionalData,slug);
+
+        await apiFunction(slug === slugs.EXAM ? JSON.stringify(additionalData): formData);
+
         props.setOpen(false);
-        setMessage({ type: "success", msg: `${slug} Added successfully` });
+        toast(`${slug} Added successfully`, { autoClose: 1000 });
+        dispatch(fetch);
       } catch (error: any) {
         const errorMsg =
           error.response?.data?.error || error.response || "Connection refused";
         setMessage({ type: "error", msg: errorMsg });
       } finally {
-        dispatch(boxAction.showBox(box));
       }
     };
 
     switch (props.slug) {
       case slugs.SUBJECT:
-        handleApiCall(addSubject, "subject", {});
+        handleApiCall(addSubject, "subject", {}, fetchSubjects());
         break;
       case slugs.EXAM_CATEGORY:
-        handleApiCall(addExamCategory, "exam_category", {});
+        handleApiCall(
+          addExamCategory,
+          "exam_category",
+          {},
+          fetchExamCategory()
+        );
         break;
       case slugs.EXAM:
-        console.log("This is image " + imageUrl);
-
         const readyToUpload = {
           ...Object.fromEntries(formData),
           subject: { id: subject },
           examCategory: { id: selected },
-          image_url: imageUrl,
         };
-        handleApiCall(addExam, "exam", readyToUpload);
+
+        handleApiCall(addExam, "exam", readyToUpload, fetchExams());
         break;
       case "user":
         console.log("This user is gonna to adrqk,k1");
@@ -117,7 +126,7 @@ const Add = (props: Props) => {
   // };
 
   return (
-    <div className=" modal-wrapper">
+    <div className=" modal-wrapper ">
       <div className="modal-box modal w-[800px] h-[500px] relative rounded-lg ">
         <div className="mb-5 shadow-md sticky top-0 bg-inherit p-4  border-inherit">
           <span
@@ -139,7 +148,8 @@ const Add = (props: Props) => {
                 item.field !== "examCategory" &&
                 item.field !== "subject" &&
                 item.field !== "createdAt" &&
-                item.field !== "active"
+                item.field !== "active" &&
+                item.field !== "title"
             )
             .map((column) => (
               <div key={column.field} className=" label-with-input ">
@@ -149,11 +159,7 @@ const Add = (props: Props) => {
                   type={column.type}
                   placeholder={column.field}
                   name={column.field}
-                  required={
-                    column.field === "title" && props.slug === "exam"
-                      ? false
-                      : true
-                  }
+                  required={props.slug === slugs.EXAM ? false : true}
                 />
               </div>
             ))}
@@ -204,10 +210,11 @@ const Add = (props: Props) => {
                     ))}
                 </select>
               </div>
-              <div className=" grid gap-2 ">
+              {/* <div className=" grid gap-2 ">
                 <p className="form-label">Image</p>
                 <div className="form-input">
-                  {image ? (
+                  {
+                  image ? (
                     <div className="grid  p-2 gap-2 ">
                       <img
                         src={image}
@@ -241,7 +248,7 @@ const Add = (props: Props) => {
                     </>
                   )}
                 </div>
-              </div>
+              </div> */}
             </>
           )}
 
@@ -249,9 +256,7 @@ const Add = (props: Props) => {
             <button type="submit" className="submit-btn">
               Submit
             </button>
-            <div  className="remove-btn">
-              Clear
-            </div>
+            <div className="remove-btn">Clear</div>
           </div>
         </form>
       </div>

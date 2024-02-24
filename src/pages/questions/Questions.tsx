@@ -41,11 +41,11 @@ function Questions() {
   }, [questionStatus, dispatch]);
   return (
     <div className="products grid gap-3">
-      <div className="header sticky top-0 flex justify-between items-center">
+      <div className="header ">
         <div className="flex items-center gap-2">
           <h1 className="header-txt">Questions</h1>
           <button
-            className="px-3 py-2 cursor-pointer rounded-md border"
+            className="px-3 py-1 cursor-pointer rounded-md border"
             onClick={() => setOpen(true)}
           >
             <MdAdd size={20} />

@@ -11,6 +11,9 @@ import {
   getExamCategorySatus,
   selectAllExamCategorys,
 } from "../../redux/examCategorySlice";
+import { MdArrowBack } from "react-icons/md";
+import { useNavigate } from "react-router-dom";
+import { CircleFadingPlus } from "lucide-react";
 
 function ExamCategory() {
   const [open, setOpen] = useState(false);
@@ -18,23 +21,26 @@ function ExamCategory() {
   const examCategoryStatus = useSelector(getExamCategorySatus);
   const dispatch = useDispatch();
   const box = store.getState().box.isOpen;
-
+  const navigate = useNavigate()
   useEffect(() => {
     if (examCategoryStatus === "idle") {
       dispatch(fetchExamCategory());
     }
-  }, [examCategoryStatus, dispatch]);
+  }, [examCategoryStatus, dispatch,examCategory]);
 
   return (
     <div className="products ">
-      <div className="header font-extrabold ">
-        <h1 className="header-txt">Exam Category</h1>
-        <button
-          className="px-3 py-2 cursor-pointer rounded-md border"
-          onClick={() => setOpen(true)}
-        >
-          Add New Exam Category
-        </button>
+      <div className="header  ">
+        <div className="flex items-center gap-2">
+          <h1 className="header-txt">Exam Category</h1>
+         <button className="normal-btn flex gap-2" onClick={() => setOpen(true)}>
+             <CircleFadingPlus/> 
+             <span>New</span>
+          </button>
+        </div>
+        <div className="cursor-pointer">
+          <MdArrowBack size={30} onClick={() => navigate(-1)} />
+        </div>
       </div>
 
       {examCategoryStatus === "pending" ? (

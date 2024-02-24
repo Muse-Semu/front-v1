@@ -13,10 +13,15 @@ import {
 import store from "../../redux/Store";
 import { selectAllExamCategorys } from "../../redux/examCategorySlice";
 import { selectAllSubjects } from "../../redux/subjectSlice";
+import { Md1KPlus, MdArrowBack, MdExposurePlus1 } from "react-icons/md";
+import { useNavigate } from "react-router-dom";
+import { CircleFadingPlus } from "lucide-react";
+import AddExam from "./AddExam";
 // import type { RootState, AppDispatch } from "../../redux/Store";
 
 function Exams() {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const box = store.getState().box.isOpen;
   const examStatus = useSelector(getExamSatus);
@@ -32,12 +37,18 @@ function Exams() {
   }, [examStatus, dispatch]);
 
   return (
-    <div className="">
-      <div className="header sticky top-0 ">
-        <h1 className="header-txt">Exams</h1>
-        <button className="normal-btn" onClick={() => setOpen(true)}>
-          Add New Exam
-        </button>
+    <div className="relative">
+      <div className="header  ">
+        <div className="flex items-center gap-2 ">
+          <h1 className="header-txt">Exams</h1>
+          <button className="normal-btn flex gap-2" onClick={() => setOpen(true)}>
+             <CircleFadingPlus/> 
+             <span>New</span>
+          </button>
+        </div>
+        <div className="cursor-pointer">
+          <MdArrowBack size={30} onClick={() => navigate(-1)} />
+        </div>
       </div>
 
       {examStatus === "pending" ? (
@@ -45,13 +56,13 @@ function Exams() {
       ) : exam.length != 0 ? (
         <DataTable slug="exams" columns={columns} rows={exam} />
       ) : (
-        <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 ">
+        <div className="fixed border flex items-center justify-center top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 ">
           Error occered while fetching data check you connection
         </div>
       )}
 
       {open && (
-        <Add
+        <AddExam
           slug={slugs.EXAM}
           subject={subject}
           examCategory={examCategory}

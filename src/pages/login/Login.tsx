@@ -1,37 +1,57 @@
 import { useState } from "react";
 import { MdClose } from "react-icons/md";
-import { login } from "../../api/APIService";
+import { getUserDetail, login } from "../../api/APIService";
 import { jwtDecode } from "jwt-decode";
 import { Link, useNavigate } from "react-router-dom";
 import { authActions } from "../../redux/authenticationSlice";
 import { useDispatch } from "react-redux";
+import { slugs } from "../../constant";
+import Cookies from "js-cookie";
+import { toast } from "react-toastify";
 
 const Login = () => {
   const [email, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const handleLoginSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+
+  const handleLoginSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const loginCredential = {
-      username: email,
+      email: email,
       password: password,
     };
-    login(JSON.stringify(loginCredential)).then((res) => {
-      if (res.data) {
-        localStorage.setItem("access_token", res.data.access_token);
-        localStorage.setItem("refresh_token", res.data.refresh_token);
-        const user = jwtDecode(res.data.access_token);
-        dispatch(
-          authActions.loginSuccess({
-            user: user,
-            access_token: res.data.access_token,
-            refresh_token: res.data.refresh_token,
-          })
-        );
-      }
-      navigate("/");
-    });
+
+    await login(JSON.stringify(loginCredential))
+      .then((res) => {
+        if (res.status === 200) {
+          Cookies.set("access_token", res.data.access_token, {
+            expires: 1 / (24),
+            secure: true,
+          });
+
+          Cookies.set("refresh_token", res.data.refresh_token, {
+            expires: 1,
+            secure: true,
+          });
+          // console.log(res.data);
+
+          const user = jwtDecode(res.data.access_token).sub;
+
+          dispatch(
+            authActions.loginSuccess({
+              user: user && user,
+              access_token: res.data.access_token,
+              refresh_token: res.data.refresh_token,
+            })
+          );
+
+          navigate("/");
+        }
+      })
+      .catch((error: any) => {
+        toast.error(error.response.data ? "Inavlid credential" : "Error");
+      });
   };
 
   return (
@@ -46,7 +66,7 @@ const Login = () => {
         <form onSubmit={handleLoginSubmit} className="grid gap-2  p-4">
           <div className="grid gap-1 ">
             <label htmlFor="" className="form-label">
-              Username
+              Email
             </label>
             <input
               value={email}
@@ -73,7 +93,8 @@ const Login = () => {
               Login
             </button>
             <span>
-              Don't have an account ? <Link to={"/"}>Register Now</Link>
+              Don't have an account ?{" "}
+              <h2 onClick={() => navigate(`${slugs.SIGNUP}`)}>Register Now</h2>
             </span>
           </div>
         </form>

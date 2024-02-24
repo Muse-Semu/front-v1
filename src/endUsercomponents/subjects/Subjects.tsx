@@ -18,6 +18,11 @@ const SubjectList = () => {
       dispatch(fetchSubjects());
     }
   }, [subjectStatus, dispatch]);
+
+  // useEffect(() => {
+  //   const interval = setInterval(refresh, 10000);
+  //   return () => clearInterval(interval);
+  // }, []);
   
   return (
     <div className="  shadow-gray-700 shadow-lg p-4">

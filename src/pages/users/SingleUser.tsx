@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { slugs } from "../../constant";
 import { useParams } from "react-router-dom";
 import { getUserById } from "../../api/APIService";
-import { access_token } from "../../service/localStorage";
+import { access_token } from "@/redux/authenticationSlice";
 
 
 const SingleUser = () => {

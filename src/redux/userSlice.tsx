@@ -1,12 +1,14 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { getAllUser } from "../api/APIService";
-import { access_token } from "../service/localStorage";
+import Cookies from "js-cookie";
 
 export interface StateType {
   users: any[];
   status: string;
   error: any;
 }
+
+const access_token = Cookies.get("access_token") || null;
 
 const initialState: StateType = {
   users: [],
@@ -19,14 +21,13 @@ export const fetchUsers: any = createAsyncThunk<any[], void>(
   async () => {
     try {
       const response = await getAllUser(access_token).then((res) => res.data);
+      
       return [...response];
     } catch (error: any) {
       return [];
     }
   }
 );
-
-
 
 const userSlice = createSlice({
   name: "user",

@@ -42,6 +42,4 @@ export const subjects = [
     image_url: null,
   },
 
- 
- 
 ];

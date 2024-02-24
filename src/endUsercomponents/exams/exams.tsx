@@ -13,6 +13,7 @@ import store from "../../redux/Store";
 import { selectAllExamCategorys } from "../../redux/examCategorySlice";
 import { selectAllSubjects } from "../../redux/subjectSlice";
 import Lists from "../common/Lists";
+import { Button } from "@/components/ui/button";
 
 function Exams() {
   const dispatch = useDispatch();
@@ -33,25 +34,20 @@ function Exams() {
     <div className="products ">
       <div className="header sticky top-0 ">
         <h1 className="header-txt">Exams</h1>
-        <button
-          className="px-3 py-2 cursor-pointer rounded-md border"
-          onClick={() => setOpen(true)}
-        >
-          Add New Exam
-        </button>
+        <Button variant="outline" onClick={() => setOpen(true)}>
+           ADD
+        </Button>
       </div>
 
       {examStatus === "pending" ? (
         <Loading />
       ) : exam.length != 0 ? (
-        <Lists data = {exam}/>
+        <Lists data={exam} />
       ) : (
         <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 ">
           Error occered while fetching data check you connection
         </div>
       )}
-
-      
     </div>
   );
 }

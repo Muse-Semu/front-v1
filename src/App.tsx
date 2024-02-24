@@ -1,13 +1,6 @@
-import {
-  createBrowserRouter,
-  RouterProvider,
-  Outlet,
-  Navigate,
-} from "react-router-dom";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Users from "./pages/users/Users";
-import Navbar from "./components/navbar/Navbar";
-import Footer from "./components/footer/Footer";
-import Menu from "./components/menu/Menu";
+
 import Login from "./pages/login/Login";
 import "./styles/global.scss";
 import Product from "./pages/product/Product";
@@ -21,54 +14,48 @@ import SingleUser from "./pages/users/SingleUser";
 import { slugs } from "./constant";
 import ExamCategory from "./pages/category/ExamCategory";
 import SingleExamCategory from "./pages/category/SingleExamCategory";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import Questions from "./pages/questions/Questions";
 import SingleSubject from "./pages/subject/SingleSubject";
-import { useEffect } from "react";
-import Home from "./pages/home/Home";
-import { access_token, refresh_token } from "./service/localStorage";
+import { useEffect, useState } from "react";
+import SignUp from "./pages/login/Register";
+import {
+  access_token,
+  authActions,
+  refresh_token,
+} from "./redux/authenticationSlice";
+import Layout from "./Layout";
+import PageNotFound from "./pages/PagesNotFund";
+import { getNewAccessToken } from "./api/APIService";
+import Cookies from "js-cookie";
+import { jwtDecode } from "jwt-decode";
 
 function App() {
-  const currentUser = useSelector((state: any) => state.authentication.user);
-  const authenticated = useSelector(
-    (state: any) => state.authentication.isAuthenticated
-  );
-  const access_token = useSelector(
-    (state: any) => state.authentication.access_token
-  );
-  const dispatch = useDispatch();
-  console.log(currentUser, authenticated);
-
-  const acess = localStorage.getItem("access_token");
-
-  console.log("Access token", acess);
-
-  const ProtectedRoute = ({ role }) => {
-    if (!authenticated) {
-      return <Navigate to="/login" replace={true} />;
+  const dispatch = useDispatch()
+  const refresh = async () => {
+    if (!refresh_token) {
+      console.log("Loggin again");
+      window.location.href = "/login";
     }
-    else if(authenticated) {
-      return <Outlet />;
+    if (!access_token) {
+      await getNewAccessToken().then((res) => {
+        console.log("Refresh token on working ", res.data.access_token);
+        Cookies.set("access_token", res.data.access_token);
+        const user = jwtDecode(res.data.access_token)?.sub;
+        dispatch(
+          authActions.loginSuccess({
+            user: user,
+            accessToken: res.data.access_token,
+          })
+        );
+      });
     }
   };
 
-  const Layout = () => {
-    return (
-      <div className="main ">
-        <Navbar user={currentUser} />
-
-        <div className="grid grid-cols-6 gap-1  ">
-          <div className="ml-2  col-span-1 top-5 mt-5 h-screen ">
-            <Menu />
-          </div>
-          <div className=" col-span-5 mr-4 mt-3  ">
-            <ProtectedRoute role={currentUser?.role} />
-          </div>
-        </div>
-        <Footer />
-      </div>
-    );
-  };
+  useEffect(() => {
+    const interval = setInterval(refresh, 100000);
+    return () => clearInterval(interval);
+  }, []);
 
   const router = createBrowserRouter([
     {
@@ -130,7 +117,12 @@ function App() {
       element: <Login />,
     },
     {
-      path: "/register",
+      path: `${slugs.LOGIN}/${slugs.SIGNUP}`,
+      element: <SignUp />,
+    },
+    {
+      path: `*`,
+      element: <PageNotFound />,
     },
   ]);
 

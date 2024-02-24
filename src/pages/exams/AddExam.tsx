@@ -1,7 +1,7 @@
 import { GridColDef } from "@mui/x-data-grid";
 import { MdClose } from "react-icons/md";
 import React, { useEffect, useState } from "react";
-import { updateExam } from "../../api/APIService";
+import { addExam, updateExam } from "../../api/APIService";
 import MessageBox from "../../components/messages/MessageBox";
 import store from "../../redux/Store";
 import { useDispatch, useSelector } from "react-redux";
@@ -19,16 +19,25 @@ type Props = {
   title: string;
   slug: string;
   columns: GridColDef[];
-  editableExam: any;
-  setEditBox: React.Dispatch<React.SetStateAction<boolean>>;
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-const UpdateExam = (props: Props) => {
+type Exam = {
+  description: string;
+  givenTime: number;
+  examYear: number;
+  subject: {
+    id: number;
+  };
+  examCategory: {
+    id: number;
+  };
+};
+
+const AddExam = (props: Props) => {
   const dispatch = useDispatch();
-  const [examCategoryId, setExamCategoryId] = useState(
-    props.editableExam.examCategory.id
-  );
-  const [subjectId, setSubjectId] = useState(props.editableExam.subject.id);
+  const [examCategoryId, setExamCategoryId] = useState(1);
+  const [subjectId, setSubjectId] = useState(1);
   const [message, setMessage] = useState({
     msg: "",
     type: "",
@@ -45,7 +54,9 @@ const UpdateExam = (props: Props) => {
   };
 
   const [examFormData, setExamFormData] = useState({
-    ...props.editableExam,
+    description: "",
+    givenTime: null,
+    examYear: null,
   });
 
   const subjectStatus = useSelector(getSubjectSatus);
@@ -71,26 +82,20 @@ const UpdateExam = (props: Props) => {
       subject: { id: subjectId },
       examCategory: { id: examCategoryId },
     };
-    await updateExam(props.id, JSON.stringify(readyToUpload))
-      .then((res) => {
-        if (res.status === 200) {
-          // dispatch(boxAction.showBox(box));
-          // setMessage({ msg: "Successfully updated", type: "success" });
-          toast.success("Exam Successfuly updated");
-          props.setEditBox(false);
-          fetchExams();
-        } else {
-          toast.error("Error"+res.data.error);
-        }
-      })
-      .catch((error) => {
-        console.error("Network error:", error);
-        toast.error("Network error. Please try again.");
-      });;
+
+    await addExam(readyToUpload).then((res) => {
+      if (res.status === 200) {
+        toast.success("Exam added Successfully \n", res.data.title);
+        props.setOpen(false);
+        dispatch(fetchExams());
+      } else {
+        toast.error(res.data.error ? res.data.error : "Unexpected error");
+      }
+    });
   };
 
-  const handleInputChange = (fieldName:string, newValue:string) => {
-    setExamFormData((prevData:any) => ({
+  const handleInputChange = (fieldName: string, newValue: string) => {
+    setExamFormData((prevData: any) => ({
       ...prevData,
       [fieldName]: newValue,
     }));
@@ -102,11 +107,11 @@ const UpdateExam = (props: Props) => {
         <div className="mb-5 shadow-md sticky top-0 bg-inherit p-4  border-inherit">
           <span
             className="close absolute top-4 right-2 cursor-pointer"
-            onClick={() => props.setEditBox(false)}
+            onClick={() => props.setOpen(false)}
           >
             <MdClose size={25} />
           </span>
-          <h1 className=" text-2xl font-extrabold">EDIT {props.title}</h1>
+          <h1 className=" text-2xl font-extrabold">Add New Exam</h1>
         </div>
 
         <form
@@ -138,6 +143,7 @@ const UpdateExam = (props: Props) => {
                   onChange={(event) =>
                     handleInputChange(column.field, event.target.value)
                   }
+                  required
                 />
               </div>
             ))}
@@ -189,7 +195,7 @@ const UpdateExam = (props: Props) => {
 
           <div className="w-full grid grid-cols-2 gap-2 lg:col-span-2 my-5 font-extrabold">
             <button className="submit-btn" type="submit">
-              Update
+              Add
             </button>
             <span
               className="rounded-md p-2 text-center cursor-pointer bg-red-500 "
@@ -205,4 +211,4 @@ const UpdateExam = (props: Props) => {
   );
 };
 
-export default UpdateExam;
+export default AddExam;

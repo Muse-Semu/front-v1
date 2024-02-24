@@ -12,6 +12,8 @@ import {
 import { columns } from "./Columns";
 import Loading from "../../components/loading/Loading";
 import { slugs } from "../../constant";
+import { CircleFadingPlus } from "lucide-react";
+import { MdArrowBack } from "react-icons/md";
 // import { useQuery } from "@tanstack/react-query";
 
 const Users = () => {
@@ -38,10 +40,19 @@ const Users = () => {
   return (
     <div className="users">
       <div className="header font-extrabold">
-        <h1 className="pl-3">Users</h1>
-        <button className="button-add" onClick={() => setOpen(true)}>
-          Add New User
-        </button>
+        <div className="flex gap-2 items-center">
+          <h1 className="pl-3">Users</h1>
+          <button
+            className="normal-btn flex gap-2"
+            onClick={() => setOpen(true)}
+          >
+            <CircleFadingPlus />
+            <span>New</span>
+          </button>
+        </div>
+        <div className="cursor-pointer">
+          <MdArrowBack size={30} onClick={() => navigate(-1)} />
+        </div>
       </div>
       {/* <DataTable slug="users" columns={columns} rows={users && users} /> */}
       {/* TEST THE API */}
