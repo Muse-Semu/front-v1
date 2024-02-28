@@ -1,34 +1,27 @@
 import { useEffect, useState } from "react";
-import DataTable from "../../components/dataTable/DataTable";
-import Add from "../../components/crud/Add";
-import { useDispatch, useSelector } from "react-redux";
+
 import Loading from "../../components/loading/Loading";
 import { slugs } from "../../constant";
-import {
-  fetchExams,
-  getExamSatus,
-  selectAllExams,
-} from "../../redux/examSlice";
-import store from "../../redux/Store";
-import { selectAllExamCategorys } from "../../redux/examCategorySlice";
-import { selectAllSubjects } from "../../redux/subjectSlice";
+
+
 import Lists from "../common/Lists";
 import { Button } from "@/components/ui/button";
+import useExamStore from "@/redux/examSlice";
+import { useSubjectStore } from "@/redux/subjectSlice";
+import useExamCategoryStore from "@/redux/examCategorySlice";
 
 function Exams() {
-  const dispatch = useDispatch();
   const [open, setOpen] = useState(false);
-  const box = store.getState().box.isOpen;
-  const examStatus = useSelector(getExamSatus);
-  const exam = useSelector(selectAllExams);
-  const subject = useSelector(selectAllSubjects);
-  const examCategory = useSelector(selectAllExamCategorys);
+
+  const {exams,fetchExams,status} = useExamStore();
+  const {subjects} = useSubjectStore();
+  const {examCategorys }= useExamCategoryStore();
 
   useEffect(() => {
-    if (examStatus === "idle") {
-      dispatch(fetchExams());
-    }
-  }, [examStatus, dispatch]);
+  
+     fetchExams;
+    
+  }, []);
 
   return (
     <div className="products ">
@@ -39,10 +32,10 @@ function Exams() {
         </Button>
       </div>
 
-      {examStatus === "pending" ? (
+      {status === "pending" ? (
         <Loading />
-      ) : exam.length != 0 ? (
-        <Lists data={exam} />
+      ) : exams.length != 0 ? (
+        <Lists data={exams} />
       ) : (
         <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 ">
           Error occered while fetching data check you connection

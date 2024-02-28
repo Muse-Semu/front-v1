@@ -5,9 +5,9 @@ import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { Group } from "three/src/Three.js";
 import { useParams } from "react-router-dom";
-import { addQuestion } from "../../api/APIService";
+import { addQuestion } from "../../api/questionsApi";
 import { toast, ToastContainer } from "react-toastify";
-import { fetchQuestions } from "../../redux/questionSlice";
+import useQuestionStore from "@/redux/questionSlice";
 
 interface QuestionFormProps {
   questionCategory: {} | any;
@@ -41,7 +41,7 @@ const QuestionForm = (props: QuestionFormProps) => {
   const [questionCategory, setQuestionCategory] = useState(1);
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-
+  const {fetchQuestions,status,error} = useQuestionStore()
   const handleChange = (field: string, value: string | File | Number) => {
     setFormData((prevFormData) => ({
       ...prevFormData,
@@ -98,7 +98,7 @@ const QuestionForm = (props: QuestionFormProps) => {
       if (res.status == 200) {
         props.setOpen(false);
         toast.success("Successfully addeed");
-        dispatch(fetchQuestions());
+        fetchQuestions
       }
     });
   };

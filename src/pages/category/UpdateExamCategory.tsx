@@ -1,12 +1,11 @@
 import { GridColDef } from "@mui/x-data-grid";
 import { MdClose } from "react-icons/md";
 import React, { useState } from "react";
-import { updateExamCategory } from "../../api/APIService";
-import MessageBox from "../../components/messages/MessageBox";
+import { updateExamCategory } from "../../api/examCategoryApi";
 import store from "../../redux/Store";
 import { useDispatch } from "react-redux";
-import { boxAction } from "../../redux/boxSlice";
-import { fetchExamCategory } from "../../redux/examCategorySlice";
+import { toast } from "react-toastify";
+import useExamCategoryStore from "@/redux/examCategorySlice";
 
 type Props = {
   id: number;
@@ -28,7 +27,6 @@ const UpdateExamCategory = (props: Props) => {
     msg: "",
     type: "",
   });
-  const box = store.getState().box.isOpen;
   const handleClear = () => {
     console.log("Data cleared!");
   };
@@ -38,20 +36,21 @@ const UpdateExamCategory = (props: Props) => {
     description: props.editbaleExamCategory.description,
   });
 
+  const {examCategorys,fetchExamCategory}= useExamCategoryStore()
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
 
     await updateExamCategory(props.id, formData).then((res) => {
       if (res.status === 200) {
-        dispatch(boxAction.showBox(box));
-        setMessage({ msg: "Successfully updated", type: "success" });
+        toast.success("Successfully updated")
         setTimeout(() => {
           props.setEditBox(false);
-          dispatch(boxAction.showBox(box));
+         
         }, 1000);
 
-        dispatch(fetchExamCategory());
+       fetchExamCategory;
       }
     });
   };
@@ -119,7 +118,6 @@ const UpdateExamCategory = (props: Props) => {
           </div>
         </form>
       </div>
-      {box && <MessageBox message={message} />}
     </div>
   );
 };

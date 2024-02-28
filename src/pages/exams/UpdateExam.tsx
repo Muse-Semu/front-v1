@@ -1,18 +1,12 @@
 import { GridColDef } from "@mui/x-data-grid";
 import { MdClose } from "react-icons/md";
 import React, { useEffect, useState } from "react";
-import { updateExam } from "../../api/APIService";
-import MessageBox from "../../components/messages/MessageBox";
+import { updateExam } from "../../api/examsApi";
 import store from "../../redux/Store";
-import { useDispatch, useSelector } from "react-redux";
-import { boxAction } from "../../redux/boxSlice";
-import {
-  fetchExamCategory,
-  getExamCategorySatus,
-} from "../../redux/examCategorySlice";
-import { fetchSubjects, getSubjectSatus } from "../../redux/subjectSlice";
 import { toast } from "react-toastify";
-import { fetchExams } from "../../redux/examSlice";
+import useExamStore from "@/redux/examSlice";
+import useExamCategoryStore from "@/redux/examCategorySlice";
+import { useSubjectStore } from "@/redux/subjectSlice";
 
 type Props = {
   id: any;
@@ -24,7 +18,8 @@ type Props = {
 };
 
 const UpdateExam = (props: Props) => {
-  const dispatch = useDispatch();
+  const { exams, status, error, fetchExams } = useExamStore();
+
   const [examCategoryId, setExamCategoryId] = useState(
     props.editableExam.examCategory.id
   );
@@ -33,12 +28,8 @@ const UpdateExam = (props: Props) => {
     msg: "",
     type: "",
   });
-  const box = store.getState().box.isOpen;
-  const subject = useSelector((state: any) => state.subject.subjects);
-  const examCategory = useSelector(
-    (state: any) => state.examCategory.examCategorys
-  );
-  const examCategoryStatus = useSelector(getExamCategorySatus);
+ const { examCategorys, } = useExamCategoryStore();
+ const { subjects } = useSubjectStore();
 
   const handleClear = () => {
     console.log("Data cleared!");
@@ -48,19 +39,19 @@ const UpdateExam = (props: Props) => {
     ...props.editableExam,
   });
 
-  const subjectStatus = useSelector(getSubjectSatus);
+  // const subjectStatus = useSelector(getSubjectSatus);
 
-  useEffect(() => {
-    if (subjectStatus === "idle") {
-      dispatch(fetchSubjects());
-    }
-  }, [subjectStatus, dispatch]);
+  // useEffect(() => {
+  //   if (subjectStatus === "idle") {
+  //     dispatch(fetchSubjects());
+  //   }
+  // }, [subjectStatus, dispatch]);
 
-  useEffect(() => {
-    if (examCategoryStatus === "idle") {
-      dispatch(fetchExamCategory());
-    }
-  }, [examCategoryStatus, dispatch]);
+  // useEffect(() => {
+  //   if (examCategoryStatus === "idle") {
+  //     dispatch(fetchExamCategory());
+  //   }
+  // }, [examCategoryStatus, dispatch]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -78,19 +69,29 @@ const UpdateExam = (props: Props) => {
           // setMessage({ msg: "Successfully updated", type: "success" });
           toast.success("Exam Successfuly updated");
           props.setEditBox(false);
-          fetchExams();
+          fetchExams;
         } else {
-          toast.error("Error"+res.data.error);
+          toast.error("Error" + res.data.error);
         }
       })
       .catch((error) => {
-        console.error("Network error:", error);
-        toast.error("Network error. Please try again.");
-      });;
+        if (
+          error.response &&
+          error.response.data &&
+          error.response.data.error
+        ) {
+          // If there's an error response from the server
+          toast.error("Error: " + error.response.data.error);
+        } else {
+          // If it's a network error or doesn't have the expected error response
+          console.error("Network error:", error);
+          toast.error("Network error. Please try again.");
+        }
+      });
   };
 
-  const handleInputChange = (fieldName:string, newValue:string) => {
-    setExamFormData((prevData:any) => ({
+  const handleInputChange = (fieldName: string, newValue: string) => {
+    setExamFormData((prevData: any) => ({
       ...prevData,
       [fieldName]: newValue,
     }));
@@ -156,8 +157,8 @@ const UpdateExam = (props: Props) => {
                 setExamCategoryId(e.target.value);
               }}
             >
-              {examCategory &&
-                examCategory.map((option: any) => (
+              {examCategorys &&
+                examCategorys.map((option: any) => (
                   <option key={option.id} value={option.id}>
                     {option.title}
                   </option>
@@ -178,8 +179,8 @@ const UpdateExam = (props: Props) => {
               }}
               required
             >
-              {subject &&
-                subject.map((option: any) => (
+              {subjects &&
+                subjects.map((option: any) => (
                   <option key={option.id} value={option.id}>
                     {option.title}
                   </option>
@@ -200,7 +201,6 @@ const UpdateExam = (props: Props) => {
           </div>
         </form>
       </div>
-      {box && <MessageBox message={message} />}
     </div>
   );
 };

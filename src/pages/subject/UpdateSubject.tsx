@@ -1,11 +1,9 @@
 import { GridColDef } from "@mui/x-data-grid";
 import { MdClose } from "react-icons/md";
 import React, { useState } from "react";
-import { updateSubject } from "../../api/APIService";
-import MessageBox from "../../components/messages/MessageBox";
+import { updateSubject } from "../../api/subjectsApi";
 import store from "../../redux/Store";
-import { useDispatch } from "react-redux";
-import { boxAction } from "../../redux/boxSlice";
+import { toast } from "react-toastify";
 
 type Props = {
   id: number;
@@ -17,13 +15,11 @@ type Props = {
 };
 
 const UpdateSubject = (props: Props) => {
-  const dispatch = useDispatch();
 
   const [message, setMessage] = useState({
     msg: "",
     type: "",
   });
-  const box = store.getState().box.isOpen;
   const handleClear = () => {
     console.log("Data cleared!");
   };
@@ -39,8 +35,7 @@ const UpdateSubject = (props: Props) => {
 
     await updateSubject(props.id, formData).then((res) => {
       if (res.status === 200) {
-        dispatch(boxAction.showBox(box));
-        setMessage({ msg: "Successfully updated", type: "success" });
+       toast.success("Successfully updated");
       }
     });
   };
@@ -108,7 +103,6 @@ const UpdateSubject = (props: Props) => {
           </div>
         </form>
       </div>
-      {box && <MessageBox message={message} />}
     </div>
   );
 };

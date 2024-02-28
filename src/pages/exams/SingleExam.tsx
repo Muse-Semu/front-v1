@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { getExamById } from "../../api/APIService";
+import { getExamById } from "../../api/examsApi";
 import { slugs } from "../../constant";
 import { columns } from "./columns";
 import UpdateExam from "./UpdateExam";

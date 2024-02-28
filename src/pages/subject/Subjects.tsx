@@ -2,34 +2,42 @@ import { Reducer, useEffect, useState } from "react";
 import DataTable from "../../components/dataTable/DataTable";
 import Add from "../../components/crud/Add";
 import { GridColDef } from "@mui/x-data-grid";
-import { getSubjectById } from "../../api/APIService";
+import { getSubjectById } from "../../api/subjectsApi";
 import { useDispatch, useSelector } from "react-redux";
 import Loading from "../../components/loading/Loading";
 import { useNavigate, useParams } from "react-router-dom";
 import { slugs } from "../../constant";
 import { columns } from "./columns";
-import {
-  fetchSubjects,
-  getSubjectSatus,
-  selectAllSubjects,
-} from "../../redux/subjectSlice";
-import store from "../../redux/Store";
+// import {
+//   fetchSubjects,
+//   getSubjectSatus,
+//   selectAllSubjects,
+// } from "../../redux/subjectSlice";
 import { MdArrowBack } from "react-icons/md";
 import { CircleFadingPlus } from "lucide-react";
+import useAuthStore from "@/redux/authenticationSlice";
+import { useSubjectStore } from "@/redux/subjectSlice";
 
 function Subjects() {
-  const dispatch = useDispatch();
   const [open, setOpen] = useState(false);
-  const subject = useSelector(selectAllSubjects);
-  const subjectStatus = useSelector(getSubjectSatus);
+  // const subject = useSelector(selectAllSubjects);
+  // const subjectStatus = useSelector(getSubjectSatus);
   const navigate = useNavigate()
-  useEffect(() => {
-    if (subjectStatus === "idle") {
-      dispatch(fetchSubjects());
-    }
-  }, [subjectStatus, dispatch]);
+  // useEffect(() => {
+  //   if (subjectStatus === "idle") {
+  //     dispatch(fetchSubjects());
+  //   }
+  // }, [subjectStatus, dispatch]);
 
-  const box = useSelector((state: any) => state.box.isOpen);
+  const {subjects,fetchSubjects,status} = useSubjectStore()
+  const {accessToken} =useAuthStore()
+
+  useEffect(() => {
+     if (status === "idle") {
+       fetchSubjects();
+     }
+  }, []);
+
 
   return (
     <div className="products ">
@@ -49,10 +57,10 @@ function Subjects() {
         </div>
       </div>
 
-      {subjectStatus === "pending" ? (
+      {status === "pending" ? (
         <Loading />
-      ) : subject.length != 0 ? (
-        <DataTable slug={slugs.SUBJECT} columns={columns} rows={subject} />
+      ) : subjects.length != 0 ? (
+        <DataTable slug={slugs.SUBJECT} columns={columns} rows={subjects} />
       ) : (
         <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 ">
           Error occered while fetching data check you connection

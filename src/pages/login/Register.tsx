@@ -4,7 +4,7 @@ import { MdClose } from "react-icons/md";
 import { jwtDecode } from "jwt-decode";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import { register } from "../../api/APIService";
+import { register } from "../../api/authApi";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Cookies from "js-cookie";
@@ -30,27 +30,21 @@ const SignUp = () => {
         email: username,
         password: password,
         role: "USER",
+        enabled:false
       };
 
       const res = await register(JSON.stringify(registrationData));
       console.log(res.data);
       if (res.status === 200) {
-        Cookies.set("access_token", res.data.access_token, {
-          expires: 1 / (24 * 60 * 30),
-          secure: true,
-        });
-
-        Cookies.set("refresh_token", res.data.refresh_token, {
-          expires: 7,
-          secure: true,
-        });
+        toast.success("You have registered successfully!");
+        navigate("/login");
       } else {
-        setErrorMessage(res.data.error);
+        toast.error(res?.data?.error);
       }
 
       // You may handle successful registration, e.g., redirecting the user or displaying a success message
     } catch (error) {
-      setErrorMessage("Error during registration"); // Display error message
+      toast.error("Error during registration"); // Display error message
     }
   };
 

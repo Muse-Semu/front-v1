@@ -4,28 +4,23 @@ import "./users.scss";
 import { useEffect, useState } from "react";
 import Add from "../../components/crud/Add";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  fetchUsers,
-  getUserStatus,
-  selectAllusers,
-} from "../../redux/userSlice";
+
 import { columns } from "./Columns";
 import Loading from "../../components/loading/Loading";
 import { slugs } from "../../constant";
 import { CircleFadingPlus } from "lucide-react";
 import { MdArrowBack } from "react-icons/md";
+import useUserStore, { UserState } from "@/redux/userSlice";
 // import { useQuery } from "@tanstack/react-query";
 
 const Users = () => {
   const [open, setOpen] = useState(false);
-  const users = useSelector(selectAllusers);
-  const dispatch = useDispatch();
-  const userStatus = useSelector(getUserStatus);
+  const {users,status,error,fetchUsers}:UserState = useUserStore()
   useEffect(() => {
-    if (userStatus === "idle") {
-      dispatch(fetchUsers());
+    if (status === "idle") {
+     fetchUsers();
     }
-  }, [userStatus, dispatch]);
+  }, [status]);
   // TEST THE API
 
   // const { isLoading, data } = useQuery({
@@ -57,7 +52,7 @@ const Users = () => {
       {/* <DataTable slug="users" columns={columns} rows={users && users} /> */}
       {/* TEST THE API */}
 
-      {userStatus === "pending" ? (
+      {status === "pending" ? (
         <Loading />
       ) : users.length != 0 ? (
         <DataTable slug={slugs.USER} columns={columns} rows={users} />

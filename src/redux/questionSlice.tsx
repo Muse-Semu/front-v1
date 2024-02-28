@@ -1,58 +1,29 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { getExams, getQuestions } from "../api/APIService";
-import { baseUrl } from "../api/http-common";
+import {create} from "zustand";
+import axios from "axios"; // Assuming you're using axios for HTTP requests
+import { baseUrl } from "@/api/http-common";
+import { getQuestions } from "@/api/questionsApi";
 
-export interface StateType {
+export interface QuestionType {
   questions: any[];
   status: string;
   error: any;
+  fetchQuestions:()=>Promise<void>
 }
 
-const initialState: StateType = {
+const useQuestionStore = create<QuestionType>((set) => ({
   questions: [],
   status: "idle",
   error: null,
-};
-
-export const fetchQuestions:any = createAsyncThunk<any[], void>(
-  "fetch/questions",
-  async () => {
+  fetchQuestions: async () => {
     try {
-      const response = await getQuestions().then(res=>res.data);
-      return response ? [...response] : [];
-    } catch (error: any) {
-      return [];
+      set({ status: "pending" });
+      const response = await getQuestions(); // Assuming baseUrl is defined somewhere
+      set({ questions: response.data, status: "succeeded" });
+    } catch (error) {
+      set({ status: "failed", error: "Error" });
     }
-  }
-);
-const questionSlice = createSlice({
-  name: "question",
-  initialState,
-  reducers: {},
-
-  extraReducers(builder) {
-    builder
-      .addCase(fetchQuestions.pending, (state, action) => {
-        state.status = "pending";
-      })
-
-      .addCase(fetchQuestions.fulfilled, (state, action) => {
-        state.questions= action.payload;
-        state.status = "succeeded";
-      })
-      .addCase(fetchQuestions.rejected, (state, action) => {
-        state.status = "failed";
-        state.error = "Error";
-      });
   },
-});
+}));
 
 
-
-export const selectAllQuestions = (state: any) => state.question.questions;
-export const getQuestionSatus = (state: any) => state.question.status;
-export const getQuestionError = (state: any) => state.question.error;
-
-export const questionAction = questionSlice.actions;
-
-export default questionSlice;
+export default useQuestionStore;

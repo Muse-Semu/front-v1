@@ -1,59 +1,26 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { getSubject } from "../api/APIService";
+import {create} from "zustand";
+import { getSubject } from "../api/subjectsApi";
 
-export interface StateType {
+export interface SubjectType {
   subjects: any[];
-  status:string,
-  error:any
+  status: string;
+  error: any;
+  fetchSubjects : ()=>Promise<void>
 }
 
-
-
-const initialState: StateType = {
+export const useSubjectStore = create<SubjectType>((set) => ({
   subjects: [],
-  status:'idle',
-  error:null
-
-};
-
-export const fetchSubjects:any = createAsyncThunk<any[], void>("fetch/subjects", async () => {
-  try {
-    const response = await getSubject().then((res) => res);
-    return [...response];
-  } catch (error: any) {
-    return [];
-  }
-});
-
-const subjectSlice = createSlice({
-  name: "subject",
-  initialState,
-  reducers: {
-    
+  status: "idle",
+  error: null,
+  fetchSubjects: async () => {
+    set({ status: "pending" });
+    try {
+      const response = await getSubject();
+      set({ subjects: response.data, status: "succeeded" });
+    } catch (error: any) {
+      set({ status: "failed", error: error.message });
+    }
   },
+}));
 
-  extraReducers(builder) {
-    builder
-      .addCase(fetchSubjects.pending, (state, action) => {
-        state.status = 'pending';
-      })
 
-      .addCase(fetchSubjects.fulfilled, (state, action) => {
-        state.subjects = action.payload;
-        state.status = 'succeeded';
-      })
-      .addCase(fetchSubjects.rejected, (state, action) => {
-        state.status = 'failed';
-        state.error = action.error.message;
-       
-      });
-  },
-});
-
-export const selectAllSubjects = (state: any) => state.subject.subjects;
-export const getSubjectSatus = (state: any) => state.subject.status;
-export const getSubjectError = (state: any) => state.subject.error;
-
-export const subjectAction = subjectSlice.actions;
-
-export default subjectSlice;

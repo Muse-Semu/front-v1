@@ -1,14 +1,15 @@
-import React from 'react'
-import { Navigate, Outlet } from 'react-router-dom';
-interface Props{
-    authenticated:boolean
-}
-const ProtectedRoute = (props:Props) => {
-  if (!props.authenticated) {
-    return <Navigate to="/login" replace={true} />;
-  } else {
-    return <Outlet />;
-  }
+import React from "react";
+import { Navigate, Outlet } from "react-router-dom";
+import useAuthStore from "./redux/authenticationSlice";
+import Loading from "./components/loading/Loading";
+interface Props {
+  authenticated: boolean;
 }
 
-export default ProtectedRoute
+const {  isAuthenticated }: any = useAuthStore.getState();
+
+const ProtectedRoute = () => {
+  return <> <Outlet/></>
+};
+
+export default ProtectedRoute;

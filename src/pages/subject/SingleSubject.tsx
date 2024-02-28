@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { getSubjectById, getSubjectChapter } from "../../api/APIService";
+import { getSubjectById, getSubjectChapter } from "../../api/subjectsApi";
 import { slugs } from "../../constant";
 import { columns } from "./columns";
 import UpdateSubject from "./UpdateSubject";

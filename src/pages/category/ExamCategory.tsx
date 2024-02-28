@@ -6,27 +6,22 @@ import Loading from "../../components/loading/Loading";
 import { slugs } from "../../constant";
 import { columns } from "./columns";
 import store from "../../redux/Store";
-import {
-  fetchExamCategory,
-  getExamCategorySatus,
-  selectAllExamCategorys,
-} from "../../redux/examCategorySlice";
+
 import { MdArrowBack } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import { CircleFadingPlus } from "lucide-react";
+import useExamCategoryStore from "@/redux/examCategorySlice";
 
 function ExamCategory() {
   const [open, setOpen] = useState(false);
-  const examCategory = useSelector(selectAllExamCategorys);
-  const examCategoryStatus = useSelector(getExamCategorySatus);
-  const dispatch = useDispatch();
-  const box = store.getState().box.isOpen;
+  // const examCategory = useSelector(selectAllExamCategorys);
+  // const examCategoryStatus = useSelector(getExamCategorySatus);
+  const {examCategorys,status,error,fetchExamCategory} = useExamCategoryStore()
+ 
   const navigate = useNavigate()
   useEffect(() => {
-    if (examCategoryStatus === "idle") {
-      dispatch(fetchExamCategory());
-    }
-  }, [examCategoryStatus, dispatch,examCategory]);
+   fetchExamCategory
+  }, []);
 
   return (
     <div className="products ">
@@ -43,13 +38,13 @@ function ExamCategory() {
         </div>
       </div>
 
-      {examCategoryStatus === "pending" ? (
+      {status === "pending" ? (
         <Loading />
-      ) : examCategory.length != 0 ? (
+      ) : examCategorys.length != 0 ? (
         <DataTable
           slug={slugs.EXAM_CATEGORY}
           columns={columns}
-          rows={examCategory}
+          rows={examCategorys}
         />
       ) : (
         <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 ">

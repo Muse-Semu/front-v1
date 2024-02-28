@@ -2,18 +2,22 @@ import React, { useEffect, useState } from "react";
 
 import { slugs } from "../../constant";
 import { useParams } from "react-router-dom";
-import { getUserById } from "../../api/APIService";
-import { access_token } from "@/redux/authenticationSlice";
+import { getUserById } from "../../api/userApi";
+import useAuthStore from "@/redux/authenticationSlice";
+import UpdateUser from "./UpdateUser";
+import { columns } from "./Columns";
+// import { access_token } from "@/redux/authenticationSlice";
 
 
 const SingleUser = () => {
   const { id } = useParams();
   const [editBox, setEditBox] = useState(false);
   const [singleUser, setSingleUser] = useState();
+  const {accessToken} = useAuthStore()
   // console.log(id);
 
   useEffect(() => {
-    getUserById(id, access_token).then((res) => {
+    getUserById(id, accessToken).then((res) => {
       setSingleUser(res.data);
     });
   }, []);

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { getExamCategoryById } from "../../api/APIService";
+import { getExamCategoryById } from "../../api/examCategoryApi";
 import { slugs } from "../../constant";
 import { columns } from "./columns";
 import UpdateExamCategory from "./UpdateExamCategory";

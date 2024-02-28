@@ -1,86 +1,40 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { getExamCategory, getExamCategoryById } from "../api/APIService";
+import create from "zustand";
+import { getExamCategory, getExamCategoryById } from "@/api/examCategoryApi";
 
-export interface StateType {
+interface ExamCategoryStore {
   examCategorys: any[];
   singleExamCategory: any;
   status: string;
   error: any;
+  fetchExamCategory: () => Promise<void>;
+  getSingleExamCategory: (id: any) => Promise<void>;
 }
 
-const initialState: StateType = {
+const useExamCategoryStore = create<ExamCategoryStore>((set) => ({
   examCategorys: [],
+  singleExamCategory: {},
   status: "idle",
   error: null,
-  singleExamCategory: {},
-};
 
-export const fetchExamCategory: any = createAsyncThunk(
-  "fetch/examCategory",
-  async () => {
+  fetchExamCategory: async () => {
+    set({ status: "pending" });
     try {
       const response = await getExamCategory();
-      return [...response];
-    } catch (error: any) {
-      return [];
+      set({ examCategorys: [...response], status: "succeeded" });
+    } catch (error) {
+      set({ status: "failed", error: "Error" });
     }
-  }
-);
+  },
 
-export const getSingleExamCategory: any = createAsyncThunk(
-  "fetch/examCategoryById",
-  async (id) => {
+  getSingleExamCategory: async (id: any) => {
+    set({ status: "pending" });
     try {
       const response = await getExamCategoryById(id).then((res) => res.data);
-      return response;
+      set({ singleExamCategory: response, status: "succeeded" });
     } catch (error) {
-      return error;
+      set({ status: "failed", error: "Error" });
     }
-  }
-);
-
-const examCategorySlice = createSlice({
-  name: "examCategory",
-  initialState,
-  reducers: {},
-
-  extraReducers(builder) {
-    builder
-      .addCase(fetchExamCategory.pending, (state, action) => {
-        state.status = "pending";
-      })
-
-      .addCase(fetchExamCategory.fulfilled, (state, action) => {
-        state.examCategorys = action.payload;
-        state.status = "succeeded";
-      })
-      .addCase(fetchExamCategory.rejected, (state, action) => {
-        state.status = "pending";
-        state.error = "Error";
-      })
-
-      .addCase(getSingleExamCategory.pending, (state, action) => {
-        state.status = "pending";
-      })
-
-      .addCase(getSingleExamCategory.fulfilled, (state, action) => {
-        state.singleExamCategory = action.payload;
-        state.status = "succeeded";
-      })
-      .addCase(getSingleExamCategory.rejected, (state, action) => {
-        state.status = "pending";
-        state.error = "Error";
-      });
   },
-});
+}));
 
-export const examCategoryAction = examCategorySlice.actions;
-
-export const selectAllExamCategorys = (state: any) =>
-  state.examCategory.examCategorys;
-export const getExamCategorySatus = (state: any) => state.examCategory.status;
-export const getExamCategoryError = (state: any) => state.examCategory.error;
-
-export const selectSingleExam = (state: any) => state.singleExamCategory;
-
-export default examCategorySlice;
+export default useExamCategoryStore;

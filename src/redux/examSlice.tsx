@@ -1,71 +1,28 @@
-import {
-  createAsyncThunk,
-  createSlice,
-} from "@reduxjs/toolkit";
-import { getExams } from "../api/APIService";
-import { baseUrl } from "../api/http-common";
+import { getExams } from "@/api/examsApi";
+import { create } from "zustand";
 
-export interface StateType {
-  questions:any[],
+export interface ExamState {
+  questions: any[];
   exams: any[];
-  status:string
+  status: string;
   error: any;
+  fetchExams: () => Promise<void>;
 }
 
-
-
-const initialState: StateType = {
+const useExamStore = create<ExamState>((set) => ({
   exams: [],
-  questions:[],
-  status:'idle',
-  error:null
- 
-};
-
-export const fetchExams:any = createAsyncThunk<any[], void>(
-  "fetch/exam",
-  async () => {
+  questions: [],
+  status: "idle",
+  error: null,
+  fetchExams: async () => {
     try {
+      set({ status: "pending" });
       const response = await getExams();
-      return response ? [...response] : [];
+      set({ exams: response ? [...response] : [], status: "succeeded" });
     } catch (error: any) {
-      return [];
+      set({ status: "failed", error: "Error" });
     }
-  }
-);
-
-const examSlice = createSlice({
-  name: "exam",
-  initialState,
-  reducers: {
-  
-   
   },
+}));
 
-  extraReducers(builder) {
-    builder
-      .addCase(fetchExams.pending, (state, action) => {
-        state.status = "pending";
-      })
-
-      .addCase(fetchExams.fulfilled, (state, action) => {
-        state.exams = action.payload;
-        state.status = "succeeded";
-      })
-      .addCase(fetchExams.rejected, (state, action) => {
-        state.status = "failed";
-        state.error = "Error";
-      })
-
-     
-  },
-});
-
-export const selectAllExams = (state:any)=>state.exam.exams
-export const getExamSatus = (state:any) => state.exam.status;
-export const getExamError = (state:any)=>state.exam.error
-
-
-export const examAction = examSlice.actions;
-
-export default examSlice;
+export default useExamStore;

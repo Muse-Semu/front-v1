@@ -9,19 +9,25 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { authActions } from "@/redux/authenticationSlice";
-import { logoutUser } from "@/service/authService";
-import { logout } from "@/api/APIService";
 
-const Navbar = ({user}) => {
+import { logout } from "@/api/authApi";
+import useAuthStore from "@/redux/authenticationSlice";
+import { useNavigate } from "react-router-dom";
 
-  const dispatch= useDispatch()
+const Navbar = () => {
+  const { logoutSuccess,userData } = useAuthStore.getState();
+  
+  const navigate = useNavigate();
+  const handleLogout = async () => {
+    // dispatch(authActions.logoutSuccess())
+    logoutSuccess();
 
-  const handleLogout = async()=>{
-    dispatch(authActions.logoutSuccess())
-    await logout().then(res=>console.log(res))
-  }
-
+    await logout().then((res) => {
+      if (res.status === 200) {
+        navigate("/login");
+      }
+    });
+  };
 
   return (
     <div className="navbar sticky top-0 bg-inherit z-20 shadow-md mb-2">
@@ -47,14 +53,15 @@ const Navbar = ({user}) => {
           <div>
             <DropdownMenu>
               <DropdownMenuTrigger>
-                <Badge variant="secondary">{user?.username}</Badge>
+                <Badge variant="secondary">{userData?.email}</Badge>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>Profile</DropdownMenuItem>
-                <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
-                
+                <DropdownMenuItem onClick={handleLogout}>
+                  Logout
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>

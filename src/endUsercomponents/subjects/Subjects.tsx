@@ -1,23 +1,34 @@
 import { useDispatch, useSelector } from "react-redux";
-import {
-  fetchSubjects,
-  getSubjectSatus,
-  selectAllSubjects,
-} from "../../redux/subjectSlice";
+// import {
+//   fetchSubjects,
+//   getSubjectSatus,
+//   selectAllSubjects,
+// } from "../../redux/subjectSlice";
 import { useEffect, useState } from "react";
 import Loading from "../../components/loading/Loading";
 import Lists from "../common/Lists";
+import { useSubjectStore } from "@/redux/subjectSlice";
 
 const SubjectList = () => {
-  const dispatch = useDispatch();
-  const subjects = useSelector(selectAllSubjects);
-  const subjectStatus = useSelector(getSubjectSatus);
+  // const subjects = useSelector(selectAllSubjects);
+  // const subjectStatus = useSelector(getSubjectSatus);
 
+  // useEffect(() => {
+  //   if (subjectStatus === "idle") {
+  //     dispatch(fetchSubjects());
+  //   }
+  // }, [subjectStatus, dispatch]);
+   const {subjects,fetchSubjects,error,status} = useSubjectStore()
+
+  
   useEffect(() => {
-    if (subjectStatus === "idle") {
-      dispatch(fetchSubjects());
-    }
-  }, [subjectStatus, dispatch]);
+   if (status === "idle") {
+     fetchSubjects();
+   }
+   
+  }, [status]);
+
+    console.log("The suject is ", subjects);
 
   // useEffect(() => {
   //   const interval = setInterval(refresh, 10000);
@@ -33,7 +44,7 @@ const SubjectList = () => {
           </h1>
         </div>
 
-        {subjectStatus === "pending" ? (
+        {status === "pending" ? (
           <Loading />
         ) : subjects.length != 0 ? (
           <Lists data={subjects} />

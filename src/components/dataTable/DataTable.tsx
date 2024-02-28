@@ -1,10 +1,7 @@
 import { DataGrid, GridColDef, GridToolbar } from "@mui/x-data-grid";
 import "./dataTable.scss";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import ConfirmBox from "../messages/ConfirmBox";
-import { boxAction } from "../../redux/boxSlice";
-import { Cell } from "recharts";
+
 // import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 type Props = {
@@ -15,8 +12,6 @@ type Props = {
 
 const DataTable = (props: Props) => {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const confirmBox = useSelector((state: any) => state.box.isConfirmBox);
 
   // TEST THE API
 
@@ -33,9 +28,7 @@ const DataTable = (props: Props) => {
   // // });
 
   const handleDelete = (id: number) => {
-    dispatch(boxAction.showConfirmBox(confirmBox));
-
-    console.log(id, confirmBox);
+   
   };
 
   const actionColumn: GridColDef = {
@@ -87,9 +80,7 @@ const DataTable = (props: Props) => {
           console.log("Current Slug is :", props.slug);
         }}
       />
-      {confirmBox && (
-        <ConfirmBox message={{ type: "error", msg: "Are you sure to " }} />
-      )}
+     
     </div>
   );
 };

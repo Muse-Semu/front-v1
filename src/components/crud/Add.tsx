@@ -2,16 +2,17 @@ import { GridColDef } from "@mui/x-data-grid";
 import "./add.scss";
 import { MdClose, MdImage } from "react-icons/md";
 import React, { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { boxAction } from "../../redux/boxSlice";
-import MessageBox from "../messages/MessageBox";
-import { addExamCategory, addExam, addSubject } from "../../api/APIService";
+
 import axios from "axios";
 import { slugs } from "../../constant";
 import { toast } from "react-toastify";
-import { fetchExamCategory } from "@/redux/examCategorySlice";
-import { fetchSubjects } from "@/redux/subjectSlice";
-import { fetchExams } from "@/redux/examSlice";
+// import { fetchSubjects } from "@/redux/subjectSlice";
+import { useSubjectStore } from "@/redux/subjectSlice";
+import useExamStore, { ExamState } from "@/redux/examSlice";
+import { addSubject } from "@/api/subjectsApi";
+import { addExamCategory } from "@/api/examCategoryApi";
+import { addExam } from "@/api/examsApi";
+import useExamCategoryStore from "@/redux/examCategorySlice";
 
 type Props = {
   slug: string;
@@ -22,8 +23,9 @@ type Props = {
 };
 
 const Add = (props: Props) => {
-  const box = useSelector((state) => state.box.isOpen);
-  const dispatch = useDispatch();
+  const { exams, status, error, fetchExams } = useExamStore();
+  const { fetchExamCategory } = useExamCategoryStore();
+ 
   const [selected, setSelected] = useState(1);
   const [subject, setSubject] = useState(1);
   const [message, setMessage] = useState({
@@ -51,6 +53,8 @@ const Add = (props: Props) => {
     console.log("Data cleared!");
   };
 
+  const fetchSubjects = useSubjectStore((state: any) => state.fetchSubjects);
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
@@ -73,13 +77,15 @@ const Add = (props: Props) => {
       fetch: any
     ) => {
       try {
-                console.log("Ready to upload *:", additionalData,slug);
+        console.log("Ready to upload *:", additionalData, slug);
 
-        await apiFunction(slug === slugs.EXAM ? JSON.stringify(additionalData): formData);
+        await apiFunction(
+          slug === slugs.EXAM ? JSON.stringify(additionalData) : formData
+        );
 
         props.setOpen(false);
         toast(`${slug} Added successfully`, { autoClose: 1000 });
-        dispatch(fetch);
+        (fetch);
       } catch (error: any) {
         const errorMsg =
           error.response?.data?.error || error.response || "Connection refused";
@@ -93,12 +99,7 @@ const Add = (props: Props) => {
         handleApiCall(addSubject, "subject", {}, fetchSubjects());
         break;
       case slugs.EXAM_CATEGORY:
-        handleApiCall(
-          addExamCategory,
-          "exam_category",
-          {},
-          fetchExamCategory()
-        );
+        handleApiCall(addExamCategory, "exam_category", {}, fetchExamCategory);
         break;
       case slugs.EXAM:
         const readyToUpload = {
@@ -107,7 +108,7 @@ const Add = (props: Props) => {
           examCategory: { id: selected },
         };
 
-        handleApiCall(addExam, "exam", readyToUpload, fetchExams());
+        handleApiCall(addExam, "exam", readyToUpload, fetchExams);
         break;
       case "user":
         console.log("This user is gonna to adrqk,k1");
@@ -148,8 +149,7 @@ const Add = (props: Props) => {
                 item.field !== "examCategory" &&
                 item.field !== "subject" &&
                 item.field !== "createdAt" &&
-                item.field !== "active" &&
-                item.field !== "title"
+                item.field !== "active"
             )
             .map((column) => (
               <div key={column.field} className=" label-with-input ">
@@ -260,7 +260,6 @@ const Add = (props: Props) => {
           </div>
         </form>
       </div>
-      {box && <MessageBox message={message} />}
     </div>
   );
 };

@@ -4,18 +4,11 @@ import store from "../../redux/Store";
 import { useDispatch, useSelector } from "react-redux";
 import { boxAction } from "../../redux/boxSlice";
 import QuestionForm from "./QuestionForm";
-import {
-  fetchQuestionCategory,
-  getQuestionCategorySatus,
-  selectAllQuestionCategorys,
-} from "../../redux/questionCategorySlice";
-import {
-  fetchQuestions,
-  getQuestionSatus,
-  selectAllQuestions,
-} from "../../redux/questionSlice";
+
 import { MdAdd, MdAddBox, MdArrowBack, MdDelete, MdEdit } from "react-icons/md";
 import UpdateQUestion from "./UpdateQUestion";
+import useQuestionStore, { QuestionType } from "@/redux/questionSlice";
+import useQuestionCategoryStore from "@/redux/questionCategorySlice";
 
 function Questions() {
   const dispatch = useDispatch();
@@ -23,22 +16,25 @@ function Questions() {
   const { id } = useParams();
   const [open, setOpen] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
-  const questionCategory = useSelector(selectAllQuestionCategorys);
-  const questionCategoryStatus = useSelector(getQuestionCategorySatus);
-  const questions = useSelector(selectAllQuestions);
-  const questionStatus = useSelector(getQuestionSatus);
+  // const questionCategory = useSelector(selectAllQuestionCategorys);
+  // const questionCategoryStatus = useSelector(getQuestionCategorySatus);
+  // const questions = useSelector(selectAllQuestions);
+  // const questionStatus = useSelector(getQuestionSatus);
   const [singleQuestion, setSingleQuestion] = useState();
+
+  const {questions,fetchQuestions}:QuestionType = useQuestionStore()
+  const {fetchQuestionCategory,status,error,questionCategorys} = useQuestionCategoryStore()
   useEffect(() => {
-    if (questionCategoryStatus === "idle") {
-      dispatch(fetchQuestionCategory());
+    if (status === "idle") {
+      fetchQuestionCategory;
     }
-  }, [questionCategoryStatus, dispatch]);
+  }, [status]);
 
   useEffect(() => {
-    if (questionStatus === "idle") {
-      dispatch(fetchQuestions());
-    }
-  }, [questionStatus, dispatch]);
+  
+    fetchQuestions;
+    
+  }, [status]);
   return (
     <div className="products grid gap-3">
       <div className="header ">

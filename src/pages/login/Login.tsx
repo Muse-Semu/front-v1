@@ -1,19 +1,23 @@
 import { useState } from "react";
 import { MdClose } from "react-icons/md";
-import { getUserDetail, login } from "../../api/APIService";
+import { getUserDetail } from "../../api/userApi";
 import { jwtDecode } from "jwt-decode";
-import { Link, useNavigate } from "react-router-dom";
-import { authActions } from "../../redux/authenticationSlice";
-import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+// import { authActions } from "../../redux/authenticationSlice";
+import { useDispatch, useSelector } from "react-redux";
 import { slugs } from "../../constant";
 import Cookies from "js-cookie";
 import { toast } from "react-toastify";
+import useAuthStore from "@/redux/authenticationSlice";
+import { login } from "@/api/authApi";
+// import { loginStatus } from "@/redux/authSlice";
 
 const Login = () => {
   const [email, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+const {loginSuccess,accessToken}:any = useAuthStore.getState();
+  console.log(accessToken);
 
   const handleLoginSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -26,25 +30,27 @@ const Login = () => {
       .then((res) => {
         if (res.status === 200) {
           Cookies.set("access_token", res.data.access_token, {
-            expires: 1 / (24),
+            expires: 1 / 24,
             secure: true,
           });
 
           Cookies.set("refresh_token", res.data.refresh_token, {
-            expires: 1,
+            expires: 7,
             secure: true,
           });
-          // console.log(res.data);
+          console.log(res.data);
 
           const user = jwtDecode(res.data.access_token).sub;
 
-          dispatch(
-            authActions.loginSuccess({
-              user: user && user,
-              access_token: res.data.access_token,
-              refresh_token: res.data.refresh_token,
-            })
-          );
+          loginSuccess(res.data.access_token, res.data.refresh_token, user);
+
+          // dispatch(
+          //   authActions.loginSuccess({
+          //     user: user && user,
+          //     access_token: res.data.access_token,
+          //     refresh_token: res.data.refresh_token,
+          //   })
+          // );
 
           navigate("/");
         }

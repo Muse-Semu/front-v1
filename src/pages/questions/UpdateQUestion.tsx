@@ -1,14 +1,12 @@
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useParams } from "react-router-dom";
-import { updateQuestion } from "../../api/APIService";
+import { updateQuestion } from "../../api/questionsApi";
 import { toast } from "react-toastify";
 import { questionFormFields } from "./columns";
 import { MdClose } from "react-icons/md";
-import { fetchQuestions } from "../../redux/questionSlice";
 
 function UpdateQUestion(props) {
-  // console.log("Editable Question", props.singleQuestion);
   const questionData = props.singleQuestion;
   const { id } = useParams();
   const dispatch = useDispatch();

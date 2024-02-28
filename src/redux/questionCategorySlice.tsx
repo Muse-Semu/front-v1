@@ -1,57 +1,31 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { getQuestionCategory } from "../api/APIService";
+import { getQuestionCategory } from "@/api/questionCategoryApi";
+import {create }from "zustand";
 
-export interface StateType {
+// Define the Zustand store
+export interface QuestionCategoryStore {
   questionCategorys: any[];
   status: string;
   error: any;
+  fetchQuestionCategory: () => Promise<void>;
 }
 
-const initialState: StateType = {
+// Create the Zustand store
+const useQuestionCategoryStore = create<QuestionCategoryStore>((set) => ({
   questionCategorys: [],
   status: "idle",
   error: null,
-};
-export const fetchQuestionCategory = createAsyncThunk(
-  "fetch/questionCategory",
-  async () => {
+
+  fetchQuestionCategory: async () => {
+    set({ status: "pending" });
     try {
-      
-      return await getQuestionCategory();
-    } catch (error: any) {
-      return [] ;
+      const questionCategorys = await getQuestionCategory();
+      set({ questionCategorys, status: "succeeded" });
+    } catch (error) {
+      set({ status: "failed", error: "Error" });
     }
-  }
-);
-
-const questionCategorySlice = createSlice({
-  name: "questionCategory",
-  initialState,
-  reducers: {},
-
-  extraReducers(builder) {
-    builder
-      .addCase(fetchQuestionCategory.pending, (state, action) => {
-        state.status = "pending";
-      })
-
-      .addCase(fetchQuestionCategory.fulfilled, (state, action) => {
-        state.questionCategorys = action.payload;
-        state.status = "succeeded";
-      })
-      .addCase(fetchQuestionCategory.rejected, (state, action) => {
-        state.status = "pending";
-        state.error = "Error";
-      });
   },
-});
+}));
 
-export const questionCategoryAction = questionCategorySlice.actions;
 
-export const selectAllQuestionCategorys = (state: any) => state.questionCategory.questionCategorys;
-export const getQuestionCategorySatus = (state: any) =>
-  state.questionCategory.status;
-export const getQuestionCategoryError = (state: any) =>
-  state.questionCategory.error;
 
-export default questionCategorySlice;
+export default useQuestionCategoryStore;

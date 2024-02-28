@@ -14,43 +14,48 @@ import SingleUser from "./pages/users/SingleUser";
 import { slugs } from "./constant";
 import ExamCategory from "./pages/category/ExamCategory";
 import SingleExamCategory from "./pages/category/SingleExamCategory";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import Questions from "./pages/questions/Questions";
 import SingleSubject from "./pages/subject/SingleSubject";
 import { useEffect, useState } from "react";
 import SignUp from "./pages/login/Register";
-import {
-  access_token,
-  authActions,
-  refresh_token,
-} from "./redux/authenticationSlice";
+// import {
+//   access_token,
+//   authActions,
+//   refresh_token,
+// } from "./redux/authenticationSlice";
 import Layout from "./Layout";
 import PageNotFound from "./pages/PagesNotFund";
-import { getNewAccessToken } from "./api/APIService";
+import { generateToken} from "./api/authApi";
 import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
+import useAuthStore, { accountData, accountStatus } from "./redux/authenticationSlice";
+import { getUserDetail } from "./api/userApi";
 
 function App() {
-  const dispatch = useDispatch()
+  const {accessToken,refreshToken,refreshTokenSuccess,account,user,userData} = useAuthStore.getState();
   const refresh = async () => {
-    if (!refresh_token) {
+    if (!refreshToken) {
       console.log("Loggin again");
       window.location.href = "/login";
     }
-    if (!access_token) {
-      await getNewAccessToken().then((res) => {
+    if (!accessToken) {
+      await generateToken().then((res) => {
         console.log("Refresh token on working ", res.data.access_token);
-        Cookies.set("access_token", res.data.access_token);
-        const user = jwtDecode(res.data.access_token)?.sub;
-        dispatch(
-          authActions.loginSuccess({
-            user: user,
-            accessToken: res.data.access_token,
-          })
-        );
+        refreshTokenSuccess(res.data.access_token);
+        account(user);
       });
     }
   };
+
+   useEffect(() => {
+     if (accessToken) {
+       getUserDetail(user, accessToken).then((res) => {
+         account(res.data);
+         console.log("Token", userData);
+       });
+     }
+   }, [accessToken]);
 
   useEffect(() => {
     const interval = setInterval(refresh, 100000);

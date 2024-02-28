@@ -2,7 +2,7 @@
 //   getNewAccessToken,
 
 import { jwtDecode } from "jwt-decode"
-import { access_token, refresh_token } from "./authenticationSlice"
+// import { access_token, refresh_token } from "./authenticationSlice"
  
 
  
@@ -75,16 +75,16 @@ import { access_token, refresh_token } from "./authenticationSlice"
 // export const selectErrorMessage = (state: any) => state.auth.errorMessage;
 // export const authenticated = (state: any) => state.auth.isAuthenticated;
 
-export const loginStatus = async ()=>{
-  // console.log(access_token, refresh_token)
-  if(access_token){
-    return jwtDecode(access_token).sub
-  }
-  else{
-    if(refresh_token){
-      await generateToken().then(res=>console.log(res.data)
-      )
-    }
-  }
-  return null
-}
+// export const loginStatus = async ()=>{
+//   // console.log(access_token, refresh_token)
+//   if(access_token){
+//     return jwtDecode(access_token).sub
+//   }
+//   else{
+//     if(refresh_token){
+//       await generateToken().then(res=>console.log(res.data)
+//       )
+//     }
+//   }
+//   return null
+// }

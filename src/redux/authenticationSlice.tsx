@@ -1,91 +1,91 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import {create} from "zustand";
 
-import { generateToken, getUserDetail } from "../api/APIService";
-import { jwtDecode } from "jwt-decode";
 import Cookies from "js-cookie";
+import { jwtDecode } from "jwt-decode";
 
+const access_token = Cookies.get("access_token") || null;
+const refresh_token = Cookies.get("refresh_token") || null;
 
-export const access_token = Cookies.get("access_token") || null;
-export const refresh_token = Cookies.get("refresh_token") || null;
+// const loginStatus = async () => {
+//   if (access_token) {
+//     const decoded =jwtDecode(access_token);
+//     return decoded.sub;
+//   } else {
+//     if (refresh_token) {
+//       console.log("Refdjd", jwtDecode(refresh_token).sub);
+//       try {
+//         const res = await generateToken();
+//         Cookies.set("access_token", res.data.access_token);
+//         return jwtDecode(refresh_token).sub;
+//       } catch (error) {
+//         console.error("Error generating token:", error);
+//         return null;
+//       }
+//     } else {
+//       return null;
+//     }
+//   }
+// };
 
-const loginStatus = async () => {
-  if (access_token) {
-    const decoded = jwtDecode(access_token);
-    return decoded.sub;
-  } else {
-    if (refresh_token) {
-      console.log("Refdjd", jwtDecode(refresh_token).sub);
-      generateToken().then(res=>Cookies.set("access_token",res.data.access_token))
-      return jwtDecode(refresh_token).sub;
-    } else {
-      return null;
-    }
-  }
+// Note: Zustand does not support async actions out of the box.
+// You may need to handle async operations outside of Zustand.
+
+const decoded = (token: string) => {
+  return token ? jwtDecode(token).sub : null;
 };
 
+interface AuthType {
+  accessToken: string | null;
+  refreshToken: string | null;
+  isAuthenticated: boolean;
+  user: string | null | undefined;
+  userData: {} | null;
+  loginStatus:string;
+  account: (user: any) => void;
+  loginSuccess: (access: string, refresh: string, email: string) => void;
+  logoutSuccess: () => void;
+  refreshTokenSuccess: (accessToken: string) =>void;
+}
 
-const loggedUser =  await loginStatus();
-
-export const getUser:any = createAsyncThunk("fetch/account", async ()=>{
-    try { 
-      return await getUserDetail(loggedUser).then(res=>res.data)
-    } catch (error) {
-      return null;
-    }
-})
-
-const authenticationSlice = createSlice({
-  name: "authentication",
-  initialState: {
-    isAuthenticated: loggedUser ? true : false,
-    accessToken: access_token ? access_token : null,
-    refreshToken: refresh_token ? refresh_token : null,
-    user: loggedUser ? loggedUser : null,
-    status:"idle",
-    account : null
+const useAuthStore = create<AuthType>((set) => ({
+  accessToken: access_token,
+  refreshToken: refresh_token,
+  isAuthenticated: access_token || refresh_token ? true : false,
+  user: decoded(access_token || refresh_token),
+  userData: null,
+  loginStatus:"idle",
+  account:  (user: any) => {
+    set({ userData: user });
   },
-  reducers: {
-    loginSuccess: (state, action) => {
-      state.isAuthenticated = true;
-      state.user = action.payload.user,
-      state.accessToken = action.payload.accessToken;
-      state.refreshToken = action.payload.refreshToken;
-    },
-    logoutSuccess: (state) => {
-      state.isAuthenticated = false;
-      state.accessToken = null;
-      state.refreshToken = null;
-      state.user = null;
-      Cookies.remove("access_token")
-      Cookies.remove("refresh_token")
-    },
-    refreshTokenSuccess: (state, action) => {
-      state.accessToken = action.payload.accessToken;
-    },
+  loginSuccess: (access: string, refresh: string, email: string) => {
+    set({
+      isAuthenticated: true,
+      accessToken: access,
+      refreshToken: refresh,
+      user: email,
+      loginStatus: "success",
+    });
   },
+  logoutSuccess: () => {
+    set({
+      isAuthenticated: false,
+      accessToken: null,
+      refreshToken: null,
+      user: null,
+    });
+    Cookies.remove("access_token");
+    Cookies.remove("refresh_token");
+  },
+  refreshTokenSuccess: (newToken:string) => {
+    set({ accessToken:newToken });
+    Cookies.set("access_token", newToken, {
+      expires: 1 / (24),
+      secure: true,
+    });
+  },
+}));
 
-    extraReducers: (builder) => {
-      builder
-        .addCase(getUser.pending, (state) => {
-          state.status = "pending";
-        })
+export const accountStatus = (state: any) => state.status;
+export const accountData = (state: any) => state.account;
 
-        .addCase(getUser.fulfilled, (state, action) => {
-          state.status = "succeeded";
-          state.account = action.payload;
-        })
-
-        .addCase(getUser.rejected,(state,action)=>{
-          state.status = "pending"
-          state.account = null
-        })
-
-       
-    },
-});
-export const accountStatus = (state: any) => state.authentication.status
-
-export const accountData = (state: any) => state.authentication.account
-
-export const authActions = authenticationSlice.actions;
-export default authenticationSlice;
+export default useAuthStore;

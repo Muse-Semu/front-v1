@@ -13,13 +13,16 @@ import { CircleFadingPlus, Edit } from "lucide-react";
 import { chapterFields } from "./chapterColumns";
 import { useState } from "react";
 import { toast } from "react-toastify";
-import { addChapter } from "@/api/APIService";
-import { access_token } from "@/redux/authenticationSlice";
+import { addChapter } from "@/api/chaptersApi";
+import useAuthStore from "@/redux/authenticationSlice";
+// import { access_token } from "@/redux/authenticationSlice";
 
 export function Chapter({ chapter, type }) {
   const [formData, setFormData] = useState({
     ...chapter,
   });
+
+  const {accessToken} = useAuthStore()
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -33,11 +36,11 @@ export function Chapter({ chapter, type }) {
 
     if (type === "new") {
       try {
-        await addChapter(formData, access_token).then((res) => {
+        await addChapter(formData).then((res) => {
           if (res.status === 200) {
             toast.success("Chapter Added Successfully", { autoClose: 1000 });
           } else if (res.status == 403) {
-            toast.error("Un authorized");
+            toast.error("Unauthorized");
           }
         });
       } catch (error) {

@@ -1,18 +1,14 @@
 import { GridColDef } from "@mui/x-data-grid";
 import { MdClose } from "react-icons/md";
 import React, { useEffect, useState } from "react";
-import { addExam, updateExam } from "../../api/APIService";
-import MessageBox from "../../components/messages/MessageBox";
+import { addExam, updateExam } from "../../api/examsApi";
 import store from "../../redux/Store";
 import { useDispatch, useSelector } from "react-redux";
-import { boxAction } from "../../redux/boxSlice";
-import {
-  fetchExamCategory,
-  getExamCategorySatus,
-} from "../../redux/examCategorySlice";
-import { fetchSubjects, getSubjectSatus } from "../../redux/subjectSlice";
+
 import { toast } from "react-toastify";
-import { fetchExams } from "../../redux/examSlice";
+import { useSubjectStore } from "@/redux/subjectSlice";
+import useExamStore from "@/redux/examSlice";
+import useExamCategoryStore from "@/redux/examCategorySlice";
 
 type Props = {
   id: any;
@@ -35,19 +31,18 @@ type Exam = {
 };
 
 const AddExam = (props: Props) => {
-  const dispatch = useDispatch();
+
+  const { exams, status, error, fetchExams } = useExamStore();
+
   const [examCategoryId, setExamCategoryId] = useState(1);
   const [subjectId, setSubjectId] = useState(1);
   const [message, setMessage] = useState({
     msg: "",
     type: "",
   });
-  const box = store.getState().box.isOpen;
-  const subject = useSelector((state: any) => state.subject.subjects);
-  const examCategory = useSelector(
-    (state: any) => state.examCategory.examCategorys
-  );
-  const examCategoryStatus = useSelector(getExamCategorySatus);
+   
+  const {examCategorys,fetchExamCategory} = useExamCategoryStore()
+  const { subjects, fetchSubjects } = useSubjectStore();
 
   const handleClear = () => {
     console.log("Data cleared!");
@@ -59,19 +54,22 @@ const AddExam = (props: Props) => {
     examYear: null,
   });
 
-  const subjectStatus = useSelector(getSubjectSatus);
+  // const subjectStatus = useSelector(getSubjectSatus);
 
-  useEffect(() => {
-    if (subjectStatus === "idle") {
-      dispatch(fetchSubjects());
-    }
-  }, [subjectStatus, dispatch]);
+  // useEffect(() => {
+  //   // Fetch subjects when the component mounts
+  //   fetchSubjects();
+  // }, [fetchSubjects]);
 
-  useEffect(() => {
-    if (examCategoryStatus === "idle") {
-      dispatch(fetchExamCategory());
-    }
-  }, [examCategoryStatus, dispatch]);
+  // useEffect(() => {
+  //   if (subjectStatus === "idle") {
+  //     dispatch(fetchSubjects());
+  //   }
+  // }, [subjectStatus, dispatch]);
+
+  // useEffect(() => {
+  //    fetchExamCategory
+  // }, []);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -87,7 +85,7 @@ const AddExam = (props: Props) => {
       if (res.status === 200) {
         toast.success("Exam added Successfully \n", res.data.title);
         props.setOpen(false);
-        dispatch(fetchExams());
+       fetchExams()
       } else {
         toast.error(res.data.error ? res.data.error : "Unexpected error");
       }
@@ -162,8 +160,8 @@ const AddExam = (props: Props) => {
                 setExamCategoryId(e.target.value);
               }}
             >
-              {examCategory &&
-                examCategory.map((option: any) => (
+              {examCategorys &&
+                examCategorys.map((option: any) => (
                   <option key={option.id} value={option.id}>
                     {option.title}
                   </option>
@@ -184,8 +182,8 @@ const AddExam = (props: Props) => {
               }}
               required
             >
-              {subject &&
-                subject.map((option: any) => (
+              {subjects &&
+                subjects.map((option: any) => (
                   <option key={option.id} value={option.id}>
                     {option.title}
                   </option>
@@ -206,7 +204,6 @@ const AddExam = (props: Props) => {
           </div>
         </form>
       </div>
-      {box && <MessageBox message={message} />}
     </div>
   );
 };
